@@ -1,0 +1,26 @@
+﻿@{
+    ViewBag.Title = "Inscription";
+}
+
+<h2>Inscription</h2>
+
+<form method="post">
+    <label>Email :</label>
+    <input type="email" name="email" required />
+
+    <label>Mot de passe :</label>
+    <input type="password" name="password" required />
+
+    <label>Role :</label>
+    <select name="role">
+        <option value="Student">Étudiant</option>
+        <option value="Teacher">Professeur</option>
+        <option value="Admin">Admin</option>
+    </select>
+
+    <button type="submit">Créer un compte</button>
+
+    <p style="color:red">@ViewBag.Error</p>
+</form>
+
+<a href="/Account/Login">Déjà inscrit ? Se connecter</a>

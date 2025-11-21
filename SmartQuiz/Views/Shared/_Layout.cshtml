@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -10,26 +14,71 @@
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">SmartQuiz</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+
+                <!-- Left side -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">SmartQuiz</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+
+                <!-- Menu -->
+                <div class="collapse navbar-collapse" id="navbarNav">
+
+                    <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
+
+                    <!-- Right side (Login / Logout) -->
+                    <ul class="navbar-nav ms-auto">
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <!-- Show email + role -->
+                            <li class="nav-item d-flex align-items-center me-2">
+                                <span class="text-dark fw-bold">
+                                    @User.Identity.Name
+                                </span>
+
+                                <span class="badge bg-primary ms-2">
+                                    @User.FindFirst(ClaimTypes.Role)?.Value
+                                </span>
+                            </li>
+
+                            <!-- Logout -->
+                            <li class="nav-item">
+                                <a class="btn btn-outline-danger" asp-controller="Account" asp-action="Logout">Déconnexion</a>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Login -->
+                            <li class="nav-item">
+                                <a class="btn btn-success" asp-controller="Account" asp-action="Login">Connexion</a>
+                            </li>
+
+                            <!-- Register -->
+                            <li class="nav-item ms-2">
+                                <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Inscription</a>
+                            </li>
+                        }
+
+                    </ul>
+
                 </div>
             </div>
         </nav>
     </header>
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -38,9 +87,10 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - SmartQuiz - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2025 - SmartQuiz - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
