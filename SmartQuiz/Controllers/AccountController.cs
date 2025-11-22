@@ -27,14 +27,14 @@ namespace SmartQuiz.Controllers
         public async Task<IActionResult> Login(string email, string password)
         {
             var user = await _userService.GetByEmail(email);
+
             if (user == null)
             {
                 ViewBag.Error = "Email incorrect";
                 return View();
             }
 
-            var hash = _userService.HashPassword(password);
-            if (hash != user.PasswordHash)
+            if (!_userService.CheckPassword(password, user.PasswordHash))
             {
                 ViewBag.Error = "Mot de passe incorrect";
                 return View();
@@ -43,6 +43,7 @@ namespace SmartQuiz.Controllers
             // Auth cookie
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.Email),
                 new Claim(ClaimTypes.Role, user.Role)
             };
@@ -54,7 +55,14 @@ namespace SmartQuiz.Controllers
                 new ClaimsPrincipal(identity)
             );
 
-            return RedirectToAction("Index", "Home");
+            // Redirection selon rôle
+            return user.Role switch
+            {
+                "Admin" => RedirectToAction("Dashboard", "Admin"),
+                "Teacher" => RedirectToAction("Dashboard", "Teacher"),
+                "Student" => RedirectToAction("Dashboard", "Student"),
+                _ => RedirectToAction("Index", "Home")
+            };
         }
 
         // GET: /Account/Register
@@ -68,25 +76,24 @@ namespace SmartQuiz.Controllers
         public async Task<IActionResult> Register(string email, string password, string role)
         {
             var exists = await _userService.GetByEmail(email);
+
             if (exists != null)
             {
                 ViewBag.Error = "Cet email est déjà utilisé";
                 return View();
             }
 
-            var user = new User
+            await _userService.CreateUser(new User
             {
                 Email = email,
-                PasswordHash = _userService.HashPassword(password),
+                PasswordHash = password,
                 Role = role
-            };
-
-            await _userService.CreateUser(user);
+            });
 
             return RedirectToAction("Login");
         }
 
-        // GET: /Account/Logout
+        // /Account/Logout
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();

@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartQuiz.Services;
+using System;
 
 namespace SmartQuiz
 {
@@ -17,44 +18,67 @@ namespace SmartQuiz
             Configuration = configuration;
         }
 
-        // Configure Services
+        // -------------------------------------------------------
+        // CONFIGURE SERVICES
+        // -------------------------------------------------------
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
 
-            // MongoDB User service
+            // Services MongoDB
             services.AddSingleton<UserService>();
+            services.AddSingleton<DatabaseInitializer>();   // Seeder Admin
 
-            // Cookie Authentication
+            // Authentification Cookie
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
                     options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout";
                     options.AccessDeniedPath = "/Account/AccessDenied";
+
+                    // Empêche les redirections infinies
+                    options.SlidingExpiration = true;
+                    options.ExpireTimeSpan = TimeSpan.FromHours(6);
                 });
+
+            // Sessions
+            services.AddSession();
         }
 
-        // Configure Middleware
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        // -------------------------------------------------------
+        // CONFIGURE - pipeline HTTP
+        // -------------------------------------------------------
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer dbInit)
         {
             if (env.IsDevelopment())
                 app.UseDeveloperExceptionPage();
             else
+            {
                 app.UseExceptionHandler("/Home/Error");
+                app.UseHsts();
+            }
 
+            // -------------------------------------------------------
+            // 🌟 SEED ADMIN AUTOMATIQUE
+            // -------------------------------------------------------
+            Task.Run(async () => await dbInit.SeedAdminUser());
+
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
 
-            // Authentication + Authorization
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=Account}/{action=Login}/{id?}");
             });
         }
     }

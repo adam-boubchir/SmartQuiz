@@ -11,6 +11,9 @@ namespace SmartQuiz.Models
         [BsonElement("email")]
         public string Email { get; set; }
 
+        [BsonElement("username")]
+        public string Username { get; set; }
+
         [BsonElement("passwordHash")]
         public string PasswordHash { get; set; }
 
