@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MongoDB.Driver;
 using SmartQuiz.Services;
 using System;
 using System.Threading.Tasks;
+using YourProject.Services;
 
 namespace SmartQuiz
 {
@@ -19,18 +21,37 @@ namespace SmartQuiz
             Configuration = configuration;
         }
 
-        // -------------------------------------------------------
-        // CONFIGURE SERVICES
-        // -------------------------------------------------------
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
 
-            // ---------- MongoDB Services ----------
+            // -------------------------------------------------------
+            // 🔥 1. MONGO DB CONFIGURATION CORRECTE
+            // -------------------------------------------------------
+            services.AddSingleton<IMongoClient>(sp =>
+                new MongoClient(Configuration["MongoDB:ConnectionString"])
+            );
+
+            services.AddSingleton<IMongoDatabase>(sp =>
+            {
+                var client = sp.GetRequiredService<IMongoClient>();
+                return client.GetDatabase(Configuration["MongoDB:DatabaseName"]);
+            });
+
+            // -------------------------------------------------------
+            // 🔥 2. SERVICES (User + Quiz + TP + Group)
+            // -------------------------------------------------------
             services.AddSingleton<UserService>();
             services.AddSingleton<DatabaseInitializer>();
+            services.AddSingleton<MongoDbService>();
 
-            // ---------- Sessions ----------
+            services.AddScoped<IQuizService, QuizService>();
+            services.AddScoped<ITpService, TpService>();
+            services.AddScoped<IGroupService, GroupService>();
+
+            // -------------------------------------------------------
+            // 🔥 3. SESSIONS
+            // -------------------------------------------------------
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
             {
@@ -39,7 +60,9 @@ namespace SmartQuiz
                 options.Cookie.IsEssential = true;
             });
 
-            // ---------- Authentification Cookie ----------
+            // -------------------------------------------------------
+            // 🔥 4. AUTH COOKIE
+            // -------------------------------------------------------
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
@@ -50,23 +73,17 @@ namespace SmartQuiz
                     options.ExpireTimeSpan = TimeSpan.FromHours(6);
                 });
 
-            // ---------- Politique d'accès par rôle ----------
+            // -------------------------------------------------------
+            // 🔥 5. ROLES
+            // -------------------------------------------------------
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("TeacherOnly", policy =>
-                    policy.RequireRole("Teacher"));
-
-                options.AddPolicy("AdminOnly", policy =>
-                    policy.RequireRole("Admin"));
-
-                options.AddPolicy("StudentOnly", policy =>
-                    policy.RequireRole("Student"));
+                options.AddPolicy("TeacherOnly", policy => policy.RequireRole("Teacher"));
+                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("StudentOnly", policy => policy.RequireRole("Student"));
             });
         }
 
-        // -------------------------------------------------------
-        // CONFIGURE PIPELINE
-        // -------------------------------------------------------
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer dbInit)
         {
             if (env.IsDevelopment())
@@ -77,7 +94,7 @@ namespace SmartQuiz
                 app.UseHsts();
             }
 
-            // ---------- Création automatique du compte Admin ----------
+            // Création de l’admin
             Task.Run(async () => await dbInit.SeedAdminUser());
 
             app.UseHttpsRedirection();
@@ -85,15 +102,12 @@ namespace SmartQuiz
 
             app.UseRouting();
 
-            // ⚠️ Obligatoire avant auth
             app.UseSession();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
-                // Route MVC classique
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Account}/{action=Login}/{id?}");

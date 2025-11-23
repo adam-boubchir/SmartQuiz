@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using YourProject.Services;
 using YourProject.Models;
+using System.Security.Claims;
+
 
 namespace YourProject.Controllers
 {
@@ -23,7 +25,7 @@ namespace YourProject.Controllers
         // Dashboard
         public async Task<IActionResult> Index()
         {
-            var teacherId = User.FindFirst("Id")?.Value;
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(teacherId))
             {
                 return RedirectToAction("Login", "Account");
@@ -43,7 +45,7 @@ namespace YourProject.Controllers
         // GET: /Teacher/Quizzes
         public async Task<IActionResult> Quizzes()
         {
-            var teacherId = User.FindFirst("Id")?.Value;
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var quizzes = await _quizService.GetByTeacherAsync(teacherId);
             return View(quizzes);
         }
@@ -51,7 +53,7 @@ namespace YourProject.Controllers
         // GET: /Teacher/Tps
         public async Task<IActionResult> Tps()
         {
-            var teacherId = User.FindFirst("Id")?.Value;
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var tps = await _tpService.GetByTeacherAsync(teacherId);
             return View(tps);
         }
@@ -59,7 +61,7 @@ namespace YourProject.Controllers
         // GET: /Teacher/Groups
         public async Task<IActionResult> Groups()
         {
-            var teacherId = User.FindFirst("Id")?.Value;
+            var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var groups = await _groupService.GetByTeacherAsync(teacherId);
             return View(groups);
         }

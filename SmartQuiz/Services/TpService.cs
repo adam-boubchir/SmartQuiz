@@ -1,18 +1,19 @@
 ﻿using MongoDB.Driver;
+using SmartQuiz.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using YourProject.Models;
-using System;
+using YourProject.Services;
 
-namespace YourProject.Services
+namespace SmartQuiz.Services
 {
     public class TpService : ITpService
     {
         private readonly IMongoCollection<Tp> _collection;
 
-        public TpService(IMongoDatabase database)
+        public TpService(MongoDbService mongo)
         {
-            _collection = database.GetCollection<Tp>("Tps");
+            _collection = mongo.GetCollection<Tp>("Tps");
         }
 
         public async Task<long> CountByTeacherAsync(string teacherId)
