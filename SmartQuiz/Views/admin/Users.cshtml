@@ -1,0 +1,58 @@
+@model List<SmartQuiz.Models.User>
+
+@{
+    ViewData["Title"] = "Gestion des utilisateurs";
+}
+
+<h2 class="text-3xl font-bold mb-6 text-gray-700">Gestion des Utilisateurs</h2>
+
+<table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden border">
+    <thead class="bg-gray-100 border-b">
+        <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Statut</th>
+            <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-3">@user.Email</td>
+                <td class="px-4 py-3">@user.Username</td>
+                <td class="px-4 py-3">@user.Role</td>
+
+                <td class="px-4 py-3">
+                    @if (user.IsApproved)
+                    {
+                        <span class="text-green-600 font-semibold">Activé</span>
+                    }
+                    else
+                    {
+                        <span class="text-red-600 font-semibold">En attente</span>
+                    }
+                </td>
+
+                <td class="px-4 py-3 text-center">
+
+                    @if (!user.IsApproved)
+                    {
+                        <a href="/Admin/Accept/@user.Id.ToString()"
+                           class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 mr-2">
+                            Accepter
+                        </a>
+                    }
+
+                    <a href="/Admin/Delete/@user.Id.ToString()"
+                       onclick="return confirm('Supprimer cet utilisateur ?');"
+                       class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+                        Supprimer
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

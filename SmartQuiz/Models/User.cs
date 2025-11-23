@@ -19,5 +19,9 @@ namespace SmartQuiz.Models
 
         [BsonElement("role")]
         public string Role { get; set; } // Admin - Teacher - Student
+
+        // ⭐ Ajout nécessaire
+        [BsonElement("isApproved")]
+        public bool IsApproved { get; set; } = false;
     }
 }

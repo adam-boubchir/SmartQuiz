@@ -24,46 +24,52 @@ namespace SmartQuiz.Controllers
 
         // POST: /Account/Login
         [HttpPost]
-        public async Task<IActionResult> Login(string email, string password)
-        {
-            var user = await _userService.GetByEmail(email);
+public async Task<IActionResult> Login(string email, string password)
+{
+    var user = await _userService.GetByEmail(email);
 
-            if (user == null)
-            {
-                ViewBag.Error = "Email incorrect";
-                return View();
-            }
+    if (user == null)
+    {
+        ViewBag.Error = "Email incorrect";
+        return View();
+    }
 
-            if (!_userService.CheckPassword(password, user.PasswordHash))
-            {
-                ViewBag.Error = "Mot de passe incorrect";
-                return View();
-            }
+    if (!_userService.CheckPassword(password, user.PasswordHash))
+    {
+        ViewBag.Error = "Mot de passe incorrect";
+        return View();
+    }
 
-            // Auth cookie
-            var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.Email),
-                new Claim(ClaimTypes.Role, user.Role)
-            };
+    // Auth cookie
+    // Auth cookie
+    var claims = new List<Claim>
+    {
+    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+    new Claim(ClaimTypes.Name, user.Email),
+    new Claim(ClaimTypes.Role, user.Role)
+    };
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+    var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-            await HttpContext.SignInAsync(
-                CookieAuthenticationDefaults.AuthenticationScheme,
-                new ClaimsPrincipal(identity)
-            );
+    await HttpContext.SignInAsync(
+    CookieAuthenticationDefaults.AuthenticationScheme,
+    new ClaimsPrincipal(identity)
+    );
 
-            // Redirection selon rôle
-            return user.Role switch
-            {
-                "Admin" => RedirectToAction("Dashboard", "Admin"),
-                "Teacher" => RedirectToAction("Dashboard", "Teacher"),
-                "Student" => RedirectToAction("Dashboard", "Student"),
-                _ => RedirectToAction("Index", "Home")
-            };
-        }
+      // ⚡ Ajouter l'email dans la session
+       HttpContext.Session.SetString("UserEmail", user.Email);
+
+      // Redirection selon rôle
+      return user.Role switch
+      {
+       "Admin" => RedirectToAction("Dashboard", "Admin"),
+       "Teacher" => RedirectToAction("Dashboard", "Teacher"),
+       "Student" => RedirectToAction("Dashboard", "Student"),
+       _ => RedirectToAction("Index", "Home")
+       };
+
+    }
+
 
         // GET: /Account/Register
         public IActionResult Register()

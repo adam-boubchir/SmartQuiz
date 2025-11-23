@@ -21,30 +21,35 @@ namespace SmartQuiz
         // -------------------------------------------------------
         // CONFIGURE SERVICES
         // -------------------------------------------------------
-        public void ConfigureServices(IServiceCollection services)
+       public void ConfigureServices(IServiceCollection services)
+{
+    services.AddControllersWithViews();
+
+    // Services MongoDB
+    services.AddSingleton<UserService>();
+    services.AddSingleton<DatabaseInitializer>();
+
+    // Authentification Cookie
+    services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+        .AddCookie(options =>
         {
-            services.AddControllersWithViews();
+            options.LoginPath = "/Account/Login";
+            options.LogoutPath = "/Account/Logout";
+            options.AccessDeniedPath = "/Account/AccessDenied";
+            options.SlidingExpiration = true;
+            options.ExpireTimeSpan = TimeSpan.FromHours(6);
+        });
 
-            // Services MongoDB
-            services.AddSingleton<UserService>();
-            services.AddSingleton<DatabaseInitializer>();   // Seeder Admin
+    // ✅ Sessions
+    services.AddDistributedMemoryCache(); // nécessaire pour la session
+    services.AddSession(options =>
+    {
+        options.IdleTimeout = TimeSpan.FromMinutes(30);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+    });
+}
 
-            // Authentification Cookie
-            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-                .AddCookie(options =>
-                {
-                    options.LoginPath = "/Account/Login";
-                    options.LogoutPath = "/Account/Logout";
-                    options.AccessDeniedPath = "/Account/AccessDenied";
-
-                    // Empêche les redirections infinies
-                    options.SlidingExpiration = true;
-                    options.ExpireTimeSpan = TimeSpan.FromHours(6);
-                });
-
-            // Sessions
-            services.AddSession();
-        }
 
         // -------------------------------------------------------
         // CONFIGURE - pipeline HTTP
@@ -69,10 +74,10 @@ namespace SmartQuiz
 
             app.UseRouting();
 
+            app.UseSession();
+
             app.UseAuthentication();
             app.UseAuthorization();
-
-            app.UseSession();
 
             app.UseEndpoints(endpoints =>
             {

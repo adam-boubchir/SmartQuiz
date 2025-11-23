@@ -1,0 +1,37 @@
+@model List<SmartQuiz.Models.User>
+
+<h2 class="text-3xl font-bold mb-6 text-gray-700">Utilisateurs en attente</h2>
+
+<table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden border">
+    <thead class="bg-gray-100 border-b">
+        <tr>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
+            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
+            <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var user in Model)
+        {
+            <tr class="border-b hover:bg-gray-50">
+                <td class="px-4 py-3">@user.Email</td>
+                <td class="px-4 py-3">@user.Username</td>
+                <td class="px-4 py-3">@user.Role</td>
+                <td class="px-4 py-3 text-center">
+                    <a href="/Admin/Accept/@user.Id.ToString()"
+                       style="background-color:#16a34a; color:white; padding:8px 12px; border-radius:6px; display:inline-block; margin-right:6px;">
+                         Accepter
+                    </a>
+
+                    <a href="/Admin/Delete/@user.Id.ToString()"
+                       onclick="return confirm('Supprimer cet utilisateur ?');"
+                       style="background-color:#dc2626; color:white; padding:8px 12px; border-radius:6px; display:inline-block;">
+                          Supprimer
+                    </a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
