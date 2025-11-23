@@ -4,32 +4,56 @@
     Layout = "~/Views/Shared/_TeacherLayout.cshtml";
 }
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between">
-        <strong>Groupes</strong>
-        <a class="btn btn-sm btn-primary" href="/Teacher/CreateGroup"><i class="fa fa-plus"></i> Nouveau Groupe</a>
+<div class="card shadow-sm">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white">
+        <h5 class="m-0 fw-semibold"><i class="fa fa-users me-2 text-primary"></i>Groupes</h5>
+        <a class="btn btn-primary btn-sm" href="/Teacher/CreateGroup">
+            <i class="fa fa-plus me-1"></i> Nouveau Groupe
+        </a>
     </div>
-    <div class="card-body p-0">
-        <table class="table mb-0">
-            <thead class="table-light"><tr><th>Nom</th><th>Étudiants</th><th></th></tr></thead>
+
+    <div class="table-responsive">
+        <table class="table align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Nom</th>
+                    <th>Étudiants</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+
             <tbody>
                 @if (Model != null && Model.Any())
                 {
                     foreach (var g in Model)
                     {
                         <tr>
-                            <td>@g.Name</td>
-                            <td>@(g.StudentIds?.Count ?? 0)</td>
+                            <td class="fw-semibold">@g.Name</td>
                             <td>
-                                <a class="btn btn-sm btn-outline-primary" href="/Teacher/EditGroup/@g.Id"><i class="fa fa-pen"></i></a>
-                                <a class="btn btn-sm btn-outline-danger" href="/Teacher/DeleteGroup/@g.Id"><i class="fa fa-trash"></i></a>
+                                <span class="badge bg-primary bg-opacity-75">
+                                    @(g.StudentIds?.Count ?? 0)
+                                </span>
+                            </td>
+
+                            <td class="text-end">
+                                <a class="btn btn-outline-primary btn-sm" href="/Teacher/EditGroup/@g.Id">
+                                    <i class="fa fa-pen"></i>
+                                </a>
+
+                                <a class="btn btn-outline-danger btn-sm" href="/Teacher/DeleteGroup/@g.Id">
+                                    <i class="fa fa-trash"></i>
+                                </a>
                             </td>
                         </tr>
                     }
                 }
                 else
                 {
-                    <tr><td colspan="3">Aucun groupe défini.</td></tr>
+                    <tr>
+                        <td colspan="3" class="text-center py-4 text-muted">
+                            Aucun groupe défini.
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>

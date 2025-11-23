@@ -9,6 +9,7 @@ using SmartQuiz.Services;
 using System;
 using System.Threading.Tasks;
 using YourProject.Services;
+using Microsoft.AspNetCore.Http;  // <-- IMPORTANT
 
 namespace SmartQuiz
 {
@@ -26,7 +27,7 @@ namespace SmartQuiz
             services.AddControllersWithViews();
 
             // -------------------------------------------------------
-            // 🔥 1. MONGO DB CONFIGURATION CORRECTE
+            // 1️⃣  MONGO DB CONFIG
             // -------------------------------------------------------
             services.AddSingleton<IMongoClient>(sp =>
                 new MongoClient(Configuration["MongoDB:ConnectionString"])
@@ -39,7 +40,7 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 🔥 2. SERVICES (User + Quiz + TP + Group)
+            // 2️⃣  SERVICES
             // -------------------------------------------------------
             services.AddSingleton<UserService>();
             services.AddSingleton<DatabaseInitializer>();
@@ -50,7 +51,7 @@ namespace SmartQuiz
             services.AddScoped<IGroupService, GroupService>();
 
             // -------------------------------------------------------
-            // 🔥 3. SESSIONS
+            // 3️⃣  SESSION
             // -------------------------------------------------------
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
@@ -61,7 +62,7 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 🔥 4. AUTH COOKIE
+            // 4️⃣ AUTH COOKIE
             // -------------------------------------------------------
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -74,7 +75,7 @@ namespace SmartQuiz
                 });
 
             // -------------------------------------------------------
-            // 🔥 5. ROLES
+            // 5️⃣ ROLES
             // -------------------------------------------------------
             services.AddAuthorization(options =>
             {
@@ -82,6 +83,12 @@ namespace SmartQuiz
                 options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
                 options.AddPolicy("StudentOnly", policy => policy.RequireRole("Student"));
             });
+
+            // -------------------------------------------------------
+            // 6️⃣ 🔥 IHttpContextAccessor (obligatoire pour @inject)
+            // -------------------------------------------------------
+            services.AddHttpContextAccessor();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer dbInit)
@@ -94,12 +101,10 @@ namespace SmartQuiz
                 app.UseHsts();
             }
 
-            // Création de l’admin
             Task.Run(async () => await dbInit.SeedAdminUser());
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
 
             app.UseSession();

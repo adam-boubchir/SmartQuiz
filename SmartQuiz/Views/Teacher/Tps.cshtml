@@ -4,25 +4,31 @@
     Layout = "~/Views/Shared/_TeacherLayout.cshtml";
 }
 
-<div class="card">
-    <div class="card-header d-flex justify-content-between">
-        <strong>Mes TPs</strong>
-        <a class="btn btn-sm btn-primary" href="/Teacher/CreateTp"><i class="fa fa-plus"></i> Nouveau TP</a>
+<div class="card shadow-sm fade-up">
+    <div class="card-header d-flex justify-content-between align-items-center bg-white">
+        <h5 class="m-0 fw-semibold"><i class="fa fa-file-lines me-2 text-primary"></i>Mes TPs</h5>
+        <div>
+            <a class="btn btn-outline-secondary btn-sm me-2" href="/Teacher/ImportTps"><i class="fa fa-file-import me-1"></i>Importer</a>
+            <a class="btn btn-primary btn-sm" href="/Teacher/CreateTp"><i class="fa fa-plus me-1"></i>Nouveau TP</a>
+        </div>
     </div>
-    <div class="card-body p-0">
-        <table class="table mb-0">
-            <thead class="table-light"><tr><th>TP</th><th>Deadline</th><th>Soumissions</th><th></th></tr></thead>
+
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr><th>TP</th><th>Deadline</th><th>Soumissions</th><th class="text-end">Actions</th></tr>
+            </thead>
             <tbody>
                 @if (Model != null && Model.Any())
                 {
                     foreach (var tp in Model)
                     {
                         <tr>
-                            <td>@tp.Title</td>
+                            <td class="fw-medium">@tp.Title</td>
                             <td>@tp.Deadline.ToLocalTime().ToString("yyyy-MM-dd")</td>
-                            <td>@(tp.Submissions?.Count ?? 0)</td>
-                            <td>
-                                <a class="btn btn-sm btn-outline-primary" href="/Teacher/EditTp/@tp.Id"><i class="fa fa-pen"></i></a>
+                            <td><span class="badge bg-success bg-opacity-10 text-success">@((tp.Submissions?.Count) ?? 0)</span></td>
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary me-1" href="/Teacher/EditTp/@tp.Id"><i class="fa fa-pen"></i></a>
                                 <a class="btn btn-sm btn-outline-danger" href="/Teacher/DeleteTp/@tp.Id"><i class="fa fa-trash"></i></a>
                             </td>
                         </tr>
@@ -30,9 +36,14 @@
                 }
                 else
                 {
-                    <tr><td colspan="4">Aucun TP créé.</td></tr>
+                    <tr><td colspan="4" class="text-center py-4 text-muted">Aucun TP créé.</td></tr>
                 }
             </tbody>
         </table>
+    </div>
+
+    <div class="card-footer text-muted d-flex justify-content-between align-items-center">
+        <small>Gestion des TPs</small>
+        <a class="small text-decoration-none" href="/Teacher/Tps">Voir tout</a>
     </div>
 </div>

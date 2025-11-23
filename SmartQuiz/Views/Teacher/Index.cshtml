@@ -1,44 +1,50 @@
 ﻿@{
-    ViewData["Title"] = "Dashboard";
+    ViewData["Title"] = "Tableau de bord";
     Layout = "~/Views/Shared/_TeacherLayout.cshtml";
 }
 
-<div class="row g-3">
-    <!-- Stats -->
-    <div class="col-12 col-md-3">
-        <div class="p-3 bg-white card-stat">
-            <small>Total Quizzes</small>
+<div class="row g-3 fade-up">
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Total Quizzes</small>
             <h3 class="mt-2">@ViewBag.TotalQuizzes</h3>
+            <div class="mt-2"><span class="badge bg-primary bg-opacity-10 text-primary">Voir</span></div>
         </div>
     </div>
-    <div class="col-12 col-md-3">
-        <div class="p-3 bg-white card-stat">
-            <small>Total TPs</small>
+
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Total TPs</small>
             <h3 class="mt-2">@ViewBag.TotalTps</h3>
+            <div class="mt-2"><span class="badge bg-primary bg-opacity-10 text-primary">Gérer</span></div>
         </div>
     </div>
-    <div class="col-12 col-md-3">
-        <div class="p-3 bg-white card-stat">
-            <small>Groupes</small>
+
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Groupes</small>
             <h3 class="mt-2">@ViewBag.TotalGroups</h3>
+            <div class="mt-2"><span class="badge bg-primary bg-opacity-10 text-primary">Groupes</span></div>
         </div>
     </div>
-    <div class="col-12 col-md-3">
-        <div class="p-3 bg-white card-stat">
-            <small>Étudiants</small>
+
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Étudiants</small>
             <h3 class="mt-2">@ViewBag.TotalStudents</h3>
+            <div class="mt-2"><span class="badge bg-primary bg-opacity-10 text-primary">Suivi</span></div>
         </div>
     </div>
 </div>
 
-<div class="row mt-4">
-    <div class="col-md-6">
-        <div class="card">
+<div class="row mt-4 g-3">
+    <div class="col-md-6 fade-up">
+        <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong>Derniers Quizzes</strong>
-                <a href="/Teacher/Quizzes" class="small">Voir tout</a>
+                <a href="/Teacher/Quizzes" class="small text-decoration-none">Voir tout</a>
             </div>
-            <div class="card-body p-0">
+            <div class="table-responsive">
                 <table class="table mb-0">
                     <thead class="table-light">
                         <tr><th>Titre</th><th>Groupe</th><th>Date</th></tr>
@@ -49,15 +55,15 @@
                             foreach (var q in ViewBag.RecentQuizzes)
                             {
                                 <tr>
-                                    <td>@q.Title</td>
+                                    <td class="fw-medium">@q.Title</td>
                                     <td>@(q.GroupId ?? "-")</td>
-                                    <td>@((q.CreatedAt as DateTime?).HasValue ? ((DateTime)q.CreatedAt).ToLocalTime().ToString("yyyy-MM-dd") : "-")</td>
+                                    <td>@(q.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd"))</td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="3">Aucun quiz trouvé.</td></tr>
+                            <tr><td colspan="3" class="text-center text-muted">Aucun quiz trouvé.</td></tr>
                         }
                     </tbody>
                 </table>
@@ -65,13 +71,13 @@
         </div>
     </div>
 
-    <div class="col-md-6">
-        <div class="card">
+    <div class="col-md-6 fade-up">
+        <div class="card shadow-sm">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <strong>Derniers TPs</strong>
-                <a href="/Teacher/Tps" class="small">Voir tout</a>
+                <a href="/Teacher/Tps" class="small text-decoration-none">Voir tout</a>
             </div>
-            <div class="card-body p-0">
+            <div class="table-responsive">
                 <table class="table mb-0">
                     <thead class="table-light"><tr><th>TP</th><th>Deadline</th></tr></thead>
                     <tbody>
@@ -80,14 +86,14 @@
                             foreach (var tp in ViewBag.RecentTps)
                             {
                                 <tr>
-                                    <td>@tp.Title</td>
+                                    <td class="fw-medium">@tp.Title</td>
                                     <td>@(tp.Deadline.ToLocalTime().ToString("yyyy-MM-dd"))</td>
                                 </tr>
                             }
                         }
                         else
                         {
-                            <tr><td colspan="2">Aucun TP trouvé.</td></tr>
+                            <tr><td colspan="2" class="text-center text-muted">Aucun TP trouvé.</td></tr>
                         }
                     </tbody>
                 </table>
