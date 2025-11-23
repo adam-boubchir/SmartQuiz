@@ -1,0 +1,41 @@
+﻿@model IEnumerable<YourProject.Models.Quiz>
+@{
+    ViewData["Title"] = "Mes Quizzes";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <strong>Mes Quizzes</strong>
+        <a class="btn btn-sm btn-primary" href="/Teacher/CreateQuiz"><i class="fa fa-plus"></i> Nouveau Quiz</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead class="table-light">
+                <tr><th>Titre</th><th>Questions</th><th>Groupe</th><th>Date</th><th></th></tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var q in Model)
+                    {
+                        <tr>
+                            <td>@q.Title</td>
+                            <td>@(q.Questions?.Count ?? 0)</td>
+                            <td>@(q.GroupId ?? "-")</td>
+                            <td>@q.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary" href="/Teacher/EditQuiz/@q.Id"><i class="fa fa-pen"></i></a>
+                                <a class="btn btn-sm btn-outline-danger" href="/Teacher/DeleteQuiz/@q.Id"><i class="fa fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="5">Aucun quiz créé.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

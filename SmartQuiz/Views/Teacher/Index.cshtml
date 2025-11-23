@@ -1,0 +1,97 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<div class="row g-3">
+    <!-- Stats -->
+    <div class="col-12 col-md-3">
+        <div class="p-3 bg-white card-stat">
+            <small>Total Quizzes</small>
+            <h3 class="mt-2">@ViewBag.TotalQuizzes</h3>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="p-3 bg-white card-stat">
+            <small>Total TPs</small>
+            <h3 class="mt-2">@ViewBag.TotalTps</h3>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="p-3 bg-white card-stat">
+            <small>Groupes</small>
+            <h3 class="mt-2">@ViewBag.TotalGroups</h3>
+        </div>
+    </div>
+    <div class="col-12 col-md-3">
+        <div class="p-3 bg-white card-stat">
+            <small>Étudiants</small>
+            <h3 class="mt-2">@ViewBag.TotalStudents</h3>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Derniers Quizzes</strong>
+                <a href="/Teacher/Quizzes" class="small">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr><th>Titre</th><th>Groupe</th><th>Date</th></tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.RecentQuizzes != null)
+                        {
+                            foreach (var q in ViewBag.RecentQuizzes)
+                            {
+                                <tr>
+                                    <td>@q.Title</td>
+                                    <td>@(q.GroupId ?? "-")</td>
+                                    <td>@((q.CreatedAt as DateTime?).HasValue ? ((DateTime)q.CreatedAt).ToLocalTime().ToString("yyyy-MM-dd") : "-")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3">Aucun quiz trouvé.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Derniers TPs</strong>
+                <a href="/Teacher/Tps" class="small">Voir tout</a>
+            </div>
+            <div class="card-body p-0">
+                <table class="table mb-0">
+                    <thead class="table-light"><tr><th>TP</th><th>Deadline</th></tr></thead>
+                    <tbody>
+                        @if (ViewBag.RecentTps != null)
+                        {
+                            foreach (var tp in ViewBag.RecentTps)
+                            {
+                                <tr>
+                                    <td>@tp.Title</td>
+                                    <td>@(tp.Deadline.ToLocalTime().ToString("yyyy-MM-dd"))</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="2">Aucun TP trouvé.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

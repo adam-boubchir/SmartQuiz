@@ -21,38 +21,44 @@ namespace SmartQuiz
         // -------------------------------------------------------
         // CONFIGURE SERVICES
         // -------------------------------------------------------
-       public void ConfigureServices(IServiceCollection services)
-{
-    services.AddControllersWithViews();
-
-    // Services MongoDB
-    services.AddSingleton<UserService>();
-    services.AddSingleton<DatabaseInitializer>();
-
-    // Authentification Cookie
-    services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-        .AddCookie(options =>
+        public void ConfigureServices(IServiceCollection services)
         {
-            options.LoginPath = "/Account/Login";
-            options.LogoutPath = "/Account/Logout";
-            options.AccessDeniedPath = "/Account/AccessDenied";
-            options.SlidingExpiration = true;
-            options.ExpireTimeSpan = TimeSpan.FromHours(6);
-        });
+            services.AddControllersWithViews();
 
-    // ✅ Sessions
-    services.AddDistributedMemoryCache(); // nécessaire pour la session
-    services.AddSession(options =>
-    {
-        options.IdleTimeout = TimeSpan.FromMinutes(30);
-        options.Cookie.HttpOnly = true;
-        options.Cookie.IsEssential = true;
-    });
-}
+            // ---------- MongoDB Services ----------
+            services.AddSingleton<UserService>();
+            services.AddSingleton<DatabaseInitializer>();
 
+            // ---------- Authentification Cookie ----------
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";       // Utiliser AccountController
+                    options.LogoutPath = "/Account/Logout";
+                    options.AccessDeniedPath = "/Account/AccessDenied";
+                    options.SlidingExpiration = true;
+                    options.ExpireTimeSpan = TimeSpan.FromHours(6);
+                });
+
+            // ---------- Politique d'accès par rôle (optionnelle) ----------
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("TeacherOnly", policy =>
+                    policy.RequireRole("Teacher"));
+            });
+
+            // ---------- Sessions ----------
+            services.AddDistributedMemoryCache(); // nécessaire pour la session
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+        }
 
         // -------------------------------------------------------
-        // CONFIGURE - pipeline HTTP
+        // CONFIGURE HTTP PIPELINE
         // -------------------------------------------------------
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer dbInit)
         {
@@ -64,9 +70,7 @@ namespace SmartQuiz
                 app.UseHsts();
             }
 
-            // -------------------------------------------------------
-            // 🌟 SEED ADMIN AUTOMATIQUE
-            // -------------------------------------------------------
+            // Seed automatique admin
             Task.Run(async () => await dbInit.SeedAdminUser());
 
             app.UseHttpsRedirection();
@@ -74,6 +78,7 @@ namespace SmartQuiz
 
             app.UseRouting();
 
+            // ⚠️ Les sessions doivent être avant l'authentification
             app.UseSession();
 
             app.UseAuthentication();
@@ -81,6 +86,12 @@ namespace SmartQuiz
 
             app.UseEndpoints(endpoints =>
             {
+                // Route pour les Area (Teacher)
+                endpoints.MapControllerRoute(
+                    name: "areas",
+                    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
+
+                // Route par défaut
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Account}/{action=Login}/{id?}");
