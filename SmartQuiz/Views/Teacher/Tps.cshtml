@@ -1,0 +1,38 @@
+﻿@model IEnumerable<YourProject.Models.Tp>
+@{
+    ViewData["Title"] = "Mes TPs";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<div class="card">
+    <div class="card-header d-flex justify-content-between">
+        <strong>Mes TPs</strong>
+        <a class="btn btn-sm btn-primary" href="/Teacher/CreateTp"><i class="fa fa-plus"></i> Nouveau TP</a>
+    </div>
+    <div class="card-body p-0">
+        <table class="table mb-0">
+            <thead class="table-light"><tr><th>TP</th><th>Deadline</th><th>Soumissions</th><th></th></tr></thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var tp in Model)
+                    {
+                        <tr>
+                            <td>@tp.Title</td>
+                            <td>@tp.Deadline.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                            <td>@(tp.Submissions?.Count ?? 0)</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary" href="/Teacher/EditTp/@tp.Id"><i class="fa fa-pen"></i></a>
+                                <a class="btn btn-sm btn-outline-danger" href="/Teacher/DeleteTp/@tp.Id"><i class="fa fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="4">Aucun TP créé.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

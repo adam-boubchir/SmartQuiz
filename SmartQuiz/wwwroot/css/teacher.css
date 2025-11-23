@@ -1,0 +1,101 @@
+﻿<!--
+
+BOOTSTRAP -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" / >
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" / >
+
+<style >
+body {
+    margin: 0;
+    background: #f5f7fb;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.sidebar {
+    width: 260px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background: linear-gradient(180deg,#0d47a1,#1565c0);
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+    .sidebar .brand {
+        font-weight: 700;
+        font-size: 20px;
+        margin-bottom: 18px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .sidebar a {
+        color: white;
+        text-decoration: none;
+        padding: 10px 12px;
+        display: block;
+        border-radius: 8px;
+        margin-bottom: 6px;
+    }
+
+        .sidebar a:hover {
+            background: rgba(255,255,255,0.08);
+        }
+
+.main {
+    margin-left: 260px;
+    padding: 20px 28px;
+}
+
+.topbar {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(15, 15, 15, 0.06);
+    margin-bottom: 18px;
+}
+
+.search-input {
+    width: 320px;
+    max-width: 50%;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #eee;
+    display: inline-block;
+}
+
+/* Cards */
+.card-stat {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(25, 25, 25, 0.06);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .sidebar {
+        width: 80px;
+    }
+
+    .main {
+        margin-left: 80px;
+        padding: 12px;
+    }
+
+    .search-input {
+        display: none;
+    }
+}
+
+</style >

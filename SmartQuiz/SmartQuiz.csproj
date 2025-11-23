@@ -17,4 +17,11 @@
     <PackageReference Include="UglyToad.PdfPig" Version="1.7.0-custom-5" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Admin\" />
+    <Folder Include="Views\Auth\" />
+    <Folder Include="Views\Student\" />
+    <Folder Include="wwwroot\media\" />
+  </ItemGroup>
+
 </Project>
