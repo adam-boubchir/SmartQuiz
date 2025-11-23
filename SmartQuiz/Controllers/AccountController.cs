@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Mvc;
 using SmartQuiz.Models;
 using SmartQuiz.Services;
 using System.Security.Claims;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
+
 
 namespace SmartQuiz.Controllers
 {
@@ -63,7 +67,7 @@ public async Task<IActionResult> Login(string email, string password)
       return user.Role switch
       {
        "Admin" => RedirectToAction("Dashboard", "Admin"),
-       "Teacher" => RedirectToAction("Dashboard", "Teacher"),
+       "Teacher" => RedirectToAction("Index", "Teacher"),
        "Student" => RedirectToAction("Dashboard", "Student"),
        _ => RedirectToAction("Index", "Home")
        };
