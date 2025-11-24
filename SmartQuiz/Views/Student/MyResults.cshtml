@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Mes Résultats";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<h3>📊 Mes Résultats</h3>
+
+<table class="table table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Quiz</th>
+            <th>Date</th>
+            <th>Score</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var result in Model)
+        {
+            <tr>
+                <td>@result.QuizTitle</td>
+                <td>@result.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
+                <td>@result.Score / @result.Total</td>
+            </tr>
+        }
+    </tbody>
+</table>

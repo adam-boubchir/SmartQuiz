@@ -6,7 +6,7 @@ using YourProject.Models;
 using System.Security.Claims;
 
 
-namespace YourProject.Controllers
+namespace SmartQuiz.Controllers
 {
     [Authorize(Roles = "Teacher")]
     public class TeacherController : Controller

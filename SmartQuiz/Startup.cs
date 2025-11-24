@@ -45,11 +45,16 @@ namespace SmartQuiz
             services.AddSingleton<UserService>();
             services.AddSingleton<DatabaseInitializer>();
             services.AddSingleton<MongoDbService>();
+          
 
+     
             services.AddScoped<IQuizService, QuizService>();
             services.AddScoped<ITpService, TpService>();
             services.AddScoped<IGroupService, GroupService>();
 
+            // ⭐ IMPORTANT
+            services.AddScoped<IStudentAnswerService, StudentAnswerService>();
+            services.AddScoped<IUserService, UserService>();
             // -------------------------------------------------------
             // 3️⃣  SESSION
             // -------------------------------------------------------

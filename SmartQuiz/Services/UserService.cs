@@ -5,7 +5,7 @@ using SmartQuiz.Models;
 
 namespace SmartQuiz.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly IMongoCollection<User> _users;
 
@@ -83,6 +83,12 @@ namespace SmartQuiz.Services
             var update = Builders<User>.Update.Set(u => u.IsApproved, true);
             await _users.UpdateOneAsync(u => u.Id == objectId, update);
         }
+        public async Task<User> GetByIdAsync(string id)
+        {
+            var objectId = ObjectId.Parse(id);
+            return await _users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
+        }
+
         public async Task<List<User>> GetPendingUsers()
         {
             return await _users.Find(u => u.IsApproved == false).ToListAsync();

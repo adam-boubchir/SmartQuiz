@@ -68,7 +68,7 @@ public async Task<IActionResult> Login(string email, string password)
       {
        "Admin" => RedirectToAction("Dashboard", "Admin"),
        "Teacher" => RedirectToAction("Index", "Teacher"),
-       "Student" => RedirectToAction("Dashboard", "Student"),
+       "Student" => RedirectToAction("Index", "Student"),
        _ => RedirectToAction("Index", "Home")
        };
 

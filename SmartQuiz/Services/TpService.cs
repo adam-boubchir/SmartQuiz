@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using YourProject.Models;
 using YourProject.Services;
+using System;
 
 namespace SmartQuiz.Services
 {
@@ -26,18 +27,39 @@ namespace SmartQuiz.Services
         {
             var filter = Builders<Tp>.Filter.Eq(t => t.teacherId, teacherId);
             var sort = Builders<Tp>.Sort.Descending(t => t.CreatedAt);
-            return await _collection.Find(filter).Sort(sort).Limit(limit).ToListAsync();
+
+            return await _collection
+                .Find(filter)
+                .Sort(sort)
+                .Limit(limit)
+                .ToListAsync();
         }
 
         public async Task<List<Tp>> GetByTeacherAsync(string teacherId)
         {
             var filter = Builders<Tp>.Filter.Eq(t => t.teacherId, teacherId);
-            return await _collection.Find(filter).SortByDescending(t => t.CreatedAt).ToListAsync();
+            return await _collection
+                .Find(filter)
+                .SortByDescending(t => t.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task<Tp> GetByIdAsync(string id)
         {
-            return await _collection.Find(t => t.Id == id).FirstOrDefaultAsync();
+            return await _collection
+                .Find(t => t.Id == id)
+                .FirstOrDefaultAsync();
+        }
+
+        // ⭐⭐ NOUVELLE MÉTHODE - Multi-teachers version étudiant
+        public async Task<List<Tp>> GetByTeachersAsync(List<string> teacherIds)
+        {
+            var filter = Builders<Tp>.Filter.In(t => t.teacherId, teacherIds);
+
+            return await _collection
+                .Find(filter)
+                .SortByDescending(t => t.CreatedAt)
+                .ToListAsync();
         }
 
         public async Task CreateAsync(Tp tp)

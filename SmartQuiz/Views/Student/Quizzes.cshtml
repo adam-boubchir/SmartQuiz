@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Tous les Quizzes";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<h3>📚 Tous les Quizzes</h3>
+
+<table class="table table-bordered mt-3">
+    <thead class="table-light">
+        <tr>
+            <th>Titre</th>
+            <th>Description</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var quiz in Model)
+        {
+            <tr>
+                <td>@quiz.Title</td>
+                <td>@quiz.Description</td>
+                <td>
+                    <a href="/Student/QuizDetail/@quiz.Id" class="btn btn-primary btn-sm">Commencer</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

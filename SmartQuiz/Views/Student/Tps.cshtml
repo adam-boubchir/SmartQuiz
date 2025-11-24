@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Tous les TP";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<h3>📝 Travaux Pratiques</h3>
+
+<table class="table table-bordered mt-3">
+    <thead class="table-light">
+        <tr>
+            <th>TP</th>
+            <th>Deadline</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tp in Model)
+        {
+            <tr>
+                <td>@tp.Title</td>
+                <td>@tp.Deadline.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                <td>
+                    <a href="/Student/TpDetail/@tp.Id" class="btn btn-secondary btn-sm">Voir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

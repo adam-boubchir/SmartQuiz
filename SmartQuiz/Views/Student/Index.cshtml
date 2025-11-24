@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["Title"] = "Tableau de bord étudiant";
+}
+
+<h2 class="mb-4">📊 Tableau de bord étudiant</h2>
+
+<div class="row g-3 fade-up">
+
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Total Quizzes</small>
+            <h3 class="mt-2">@ViewBag.QuizzesCount</h3>
+            <div class="mt-2">
+                <a href="/Student/Quizzes" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">Voir</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Total TPs</small>
+            <h3 class="mt-2">@ViewBag.TpsCount</h3>
+            <div class="mt-2">
+                <a href="/Student/Tps" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">Consulter</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Mes résultats</small>
+            <h3 class="mt-2">@ViewBag.ResultsCount</h3>
+            <div class="mt-2">
+                <a href="/Student/MyResults" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">Voir</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Mes profs</small>
+            <h3 class="mt-2">@ViewBag.TeacherCount</h3>
+            <div class="mt-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary">Info</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="row mt-4 g-3">
+
+    <!-- Derniers Quizzes -->
+    <div class="col-md-6 fade-up">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Derniers Quizzes</strong>
+                <a href="/Student/Quizzes" class="small text-decoration-none">Voir tout</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Titre</th>
+                            <th>Prof</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.RecentQuizzes != null && ViewBag.RecentQuizzes.Count > 0)
+                        {
+                            foreach (var q in ViewBag.RecentQuizzes)
+                            {
+                                <tr>
+                                    <td class="fw-medium">@q.Title</td>
+                                    <td>@(q.TeacherName ?? "-")</td>
+                                    <td>@q.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="3" class="text-center text-muted">Aucun quiz disponible.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Derniers TPs -->
+    <div class="col-md-6 fade-up">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <strong>Derniers TPs</strong>
+                <a href="/Student/Tps" class="small text-decoration-none">Voir tout</a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>TP</th>
+                            <th>Deadline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.RecentTps != null && ViewBag.RecentTps.Count > 0)
+                        {
+                            foreach (var tp in ViewBag.RecentTps)
+                            {
+                                <tr>
+                                    <td class="fw-medium">@tp.Title</td>
+                                    <td>@tp.Deadline.ToLocalTime().ToString("yyyy-MM-dd")</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr><td colspan="2" class="text-center text-muted">Aucun TP disponible.</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>

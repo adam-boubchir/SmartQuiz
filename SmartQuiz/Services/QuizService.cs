@@ -1,19 +1,18 @@
 ﻿using MongoDB.Driver;
-using SmartQuiz.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using YourProject.Models;
-using YourProject.Services;
+using System;
 
-namespace SmartQuiz.Services
+namespace YourProject.Services
 {
     public class QuizService : IQuizService
     {
         private readonly IMongoCollection<Quiz> _collection;
 
-        public QuizService(MongoDbService mongo)
+        public QuizService(IMongoDatabase database)
         {
-            _collection = mongo.GetCollection<Quiz>("Quizzes");
+            _collection = database.GetCollection<Quiz>("Quizzes");
         }
 
         public async Task<long> CountByTeacherAsync(string teacherId)
@@ -35,9 +34,22 @@ namespace SmartQuiz.Services
             return await _collection.Find(filter).SortByDescending(q => q.CreatedAt).ToListAsync();
         }
 
+        // ⭐⭐ NEW
+        public async Task<List<Quiz>> GetByTeachersAsync(List<string> teacherIds)
+        {
+            var filter = Builders<Quiz>.Filter.In(q => q.CreatedBy, teacherIds);
+            return await _collection.Find(filter).SortByDescending(q => q.CreatedAt).ToListAsync();
+        }
+
         public async Task<Quiz> GetByIdAsync(string id)
         {
             return await _collection.Find(q => q.Id == id).FirstOrDefaultAsync();
+        }
+
+        public async Task<List<Quiz>> GetByGroupAsync(string groupId)
+        {
+            var filter = Builders<Quiz>.Filter.Eq(q => q.GroupId, groupId);
+            return await _collection.Find(filter).SortByDescending(q => q.CreatedAt).ToListAsync();
         }
 
         public async Task CreateAsync(Quiz quiz)
@@ -56,4 +68,6 @@ namespace SmartQuiz.Services
             await _collection.DeleteOneAsync(q => q.Id == id);
         }
     }
+
 }
+
