@@ -1,37 +1,47 @@
 @model List<SmartQuiz.Models.User>
+@{
+    ViewData["Title"] = "Utilisateurs en attente";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
 
-<h2 class="text-3xl font-bold mb-6 text-gray-700">Utilisateurs en attente</h2>
+<h2 class="fw-bold text-dark fade-up mb-4">Utilisateurs en attente</h2>
 
-<table class="min-w-full bg-white shadow-lg rounded-lg overflow-hidden border">
-    <thead class="bg-gray-100 border-b">
-        <tr>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Email</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Username</th>
-            <th class="px-4 py-3 text-left text-sm font-medium text-gray-600">Role</th>
-            <th class="px-4 py-3 text-center text-sm font-medium text-gray-600">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var user in Model)
-        {
-            <tr class="border-b hover:bg-gray-50">
-                <td class="px-4 py-3">@user.Email</td>
-                <td class="px-4 py-3">@user.Username</td>
-                <td class="px-4 py-3">@user.Role</td>
-                <td class="px-4 py-3 text-center">
-                    <a href="/Admin/Accept/@user.Id.ToString()"
-                       style="background-color:#16a34a; color:white; padding:8px 12px; border-radius:6px; display:inline-block; margin-right:6px;">
-                         Accepter
-                    </a>
+<div class="card shadow-sm fade-up">
+    <div class="table-responsive">
+        <table class="table mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Email</th>
+                    <th>Nom d'utilisateur</th>
+                    <th>Rôle</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
 
-                    <a href="/Admin/Delete/@user.Id.ToString()"
-                       onclick="return confirm('Supprimer cet utilisateur ?');"
-                       style="background-color:#dc2626; color:white; padding:8px 12px; border-radius:6px; display:inline-block;">
-                          Supprimer
-                    </a>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr>
+                        <td>@user.Email</td>
+                        <td class="fw-medium">@user.Username</td>
+                        <td>@user.Role</td>
 
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+                        <td class="text-center">
+                            <a href="/Admin/Accept/@user.Id.ToString()"
+                               class="badge bg-success bg-opacity-10 text-success px-3 py-2 text-decoration-none">
+                                Accepter
+                            </a>
+
+                            <a href="/Admin/Delete/@user.Id.ToString()"
+                               onclick="return confirm('Supprimer cet utilisateur ?');"
+                               class="badge bg-danger bg-opacity-10 text-danger px-3 py-2 text-decoration-none ms-2">
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+
+        </table>
+    </div>
+</div>

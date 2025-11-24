@@ -1,8 +1,128 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Bienvenue sur SmartQuiz";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="home-hero fade-up">
+    <h1 class="home-title">Bienvenue sur <span>SmartQuiz</span></h1>
+    <p class="home-subtitle">
+        Une plateforme moderne de gestion des Quiz, TP, Groupes et suivi pédagogique.
+    </p>
+
+    <div class="hero-buttons">
+        <a href="/Account/Register" class="btn btn-primary btn-lg px-4">Créer un compte</a>
+        <a href="/Account/Login" class="btn btn-outline-primary btn-lg px-4">Se connecter</a>
+    </div>
 </div>
+
+<!-- FEATURE SECTIONS -->
+<div class="row mt-5 g-4">
+
+    <div class="col-md-4 fade-up">
+        <div class="feature-card">
+            <i class="fa-solid fa-chalkboard-user"></i>
+            <h3>Pour les Enseignants</h3>
+            <p>Créer et gérer des Quiz, TP, groupes d’étudiants, et suivre leur progression.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4 fade-up">
+        <div class="feature-card">
+            <i class="fa-solid fa-user-graduate"></i>
+            <h3>Pour les Étudiants</h3>
+            <p>Participer aux Quiz, réaliser les TP, consulter les notes et notifications.</p>
+        </div>
+    </div>
+
+    <div class="col-md-4 fade-up">
+        <div class="feature-card">
+            <i class="fa-solid fa-user-shield"></i>
+            <h3>Pour les Administrateurs</h3>
+            <p>Gérer les comptes, approuver les utilisateurs et superviser la plateforme.</p>
+        </div>
+    </div>
+
+</div>
+
+<style>
+    body {
+        background: #f5f7fa;
+    }
+
+    .home-hero {
+        text-align: center;
+        margin-top: 40px;
+        padding: 40px 20px;
+    }
+
+    .home-title {
+        font-size: 3rem;
+        font-weight: 800;
+        color: #0d47a1;
+    }
+
+        .home-title span {
+            color: #1565c0;
+        }
+
+    .home-subtitle {
+        font-size: 1.2rem;
+        color: #555;
+        margin-top: 12px;
+        margin-bottom: 32px;
+    }
+
+    .hero-buttons .btn {
+        border-radius: 12px;
+        margin: 0 6px;
+    }
+
+    .feature-card {
+        text-align: center;
+        background: white;
+        padding: 28px;
+        border-radius: 16px;
+        box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+        transition: transform .25s, box-shadow .25s;
+    }
+
+        .feature-card i {
+            font-size: 3rem;
+            color: #0d47a1;
+            margin-bottom: 14px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0d47a1;
+        }
+
+        .feature-card p {
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 6px 22px rgba(0,0,0,0.10);
+        }
+
+    .fade-up {
+        opacity: 0;
+        transform: translateY(15px);
+        transition: .6s ease;
+    }
+
+        .fade-up.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.fade-up').forEach((el, i) => {
+            setTimeout(() => el.classList.add('show'), 80 * i);
+        });
+    });
+</script>

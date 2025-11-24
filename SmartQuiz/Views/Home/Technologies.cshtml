@@ -1,0 +1,160 @@
+﻿@{
+    ViewData["Title"] = "Technologies utilisées";
+}
+
+<h2 class="text-center text-primary mb-4 fade-up">Technologies utilisées</h2>
+
+<div class="accordion shadow" id="techAccordion">
+
+    <!-- ASP.NET Core MVC -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t1">
+                🚀 ASP.NET Core MVC
+            </button>
+        </h2>
+        <div id="t1" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                ASP.NET Core MVC est le framework principal utilisé pour SmartQuiz.
+                Il permet :
+                <ul>
+                    <li>Une architecture claire (Controllers, Views, Services)</li>
+                    <li>Très bonne performance</li>
+                    <li>Sécurité robuste</li>
+                    <li>Intégration facile avec MongoDB</li>
+                </ul>
+
+                <a class="btn btn-outline-primary mt-2"
+                   href="https://learn.microsoft.com/aspnet/core"
+                   target="_blank">
+                    📘 Documentation officielle ASP.NET Core
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MongoDB -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t2">
+                🍃 MongoDB
+            </button>
+        </h2>
+        <div id="t2" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                MongoDB est une base NoSQL flexible utilisée pour stocker :
+                <ul>
+                    <li>Utilisateurs</li>
+                    <li>Quizzes</li>
+                    <li>TPs</li>
+                    <li>Groupes</li>
+                    <li>Résultats</li>
+                </ul>
+
+                <a class="btn btn-outline-success mt-2"
+                   href="https://www.mongodb.com/docs/"
+                   target="_blank">
+                    🍃 Documentation officielle MongoDB
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t3">
+                🎨 Bootstrap 5
+            </button>
+        </h2>
+        <div id="t3" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                Bootstrap 5 est utilisé pour :
+                <ul>
+                    <li>Layout responsive</li>
+                    <li>Composants modernes</li>
+                    <li>Grilles, animations</li>
+                </ul>
+
+                <a class="btn btn-outline-info mt-2"
+                   href="https://getbootstrap.com/docs/5.3/getting-started/introduction/"
+                   target="_blank">
+                    🎨 Documentation officielle Bootstrap 5
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- FontAwesome -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t4">
+                ⭐ FontAwesome
+            </button>
+        </h2>
+        <div id="t4" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                FontAwesome est utilisé pour toutes les icônes du site. <br />
+
+                <a class="btn btn-outline-dark mt-2"
+                   href="https://fontawesome.com/docs"
+                   target="_blank">
+                    ⭐ Documentation officielle FontAwesome
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentification JWT -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t5">
+                🔐 Authentification (JWT + Cookies)
+            </button>
+        </h2>
+        <div id="t5" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                Utilisée pour :
+                <ul>
+                    <li>Gestion des sessions</li>
+                    <li>Protection des routes</li>
+                    <li>Gestion des rôles : Admin / Teacher / Student</li>
+                </ul>
+
+                <a class="btn btn-outline-secondary mt-2"
+                   href="https://learn.microsoft.com/aspnet/core/security/authentication/?view=aspnetcore-8.0"
+                   target="_blank">
+                    🔐 Documentation Microsoft Auth & JWT
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- OLLAMA -->
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" data-bs-toggle="collapse" data-bs-target="#t6">
+                🤖 Ollama (IA locale)
+            </button>
+        </h2>
+        <div id="t6" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                Ollama permet d’exécuter des modèles IA **en local**, sans cloud.
+                Utilisé pour :
+                <ul>
+                    <li>Génération automatique de questions</li>
+                    <li>Correction intelligente</li>
+                    <li>Analyse pédagogique</li>
+                    <li>Suggestions IA</li>
+                </ul>
+
+                <a class="btn btn-outline-warning mt-2"
+                   href="https://ollama.com/"
+                   target="_blank">
+                    🤖 Documentation officielle Ollama
+                </a>
+            </div>
+        </div>
+    </div>
+
+</div>

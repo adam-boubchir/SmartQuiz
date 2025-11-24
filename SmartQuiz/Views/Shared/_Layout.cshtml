@@ -1,99 +1,159 @@
-﻿@using Microsoft.AspNetCore.Authentication
-@using Microsoft.AspNetCore.Authorization
-@using System.Security.Claims
-
+﻿@using System.Security.Claims
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - SmartQuiz</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/SmartQuiz.styles.css" asp-append-version="true" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Bootstrap + FontAwesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" />
+
+    <style>
+        body {
+            background: #f5f7fa;
+        }
+
+        /* ----------------- TOP PUBLIC NAV ----------------- */
+
+        .top-horizontal {
+            background: #fff;
+            border-bottom: 1px solid #e5eaf1;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+            .top-horizontal .nav-link {
+                color: #334155;
+                font-weight: 600;
+                padding: 8px 14px;
+            }
+
+                .top-horizontal .nav-link.active {
+                    color: #0d47a1;
+                }
+
+            .top-horizontal .btn {
+                border-radius: 10px;
+            }
+
+        /* Public main container */
+        .public-main {
+            max-width: 1200px;
+            margin: auto;
+            padding: 32px 20px;
+        }
+
+        /* Animation */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: .5s ease;
+        }
+
+            .fade-up.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+    </style>
 </head>
+
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
 
-                <!-- Left side -->
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">SmartQuiz</a>
+    <!-- ---------------- TOP PUBLIC NAV ---------------- -->
+    <header class="top-horizontal shadow-sm">
+        <div class="container d-flex align-items-center justify-content-between py-2">
 
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+            <div class="d-flex align-items-center gap-3">
 
-                <!-- Menu -->
-                <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- LOGO -->
+                <a href="/" class="d-flex align-items-center text-decoration-none">
+                    <i class="fa-solid fa-graduation-cap fa-2x text-primary me-2"></i>
+                    <div class="d-none d-md-block">
+                        <div class="fw-bold text-primary">SmartQuiz</div>
+                        <small class="text-muted">Plateforme pédagogique</small>
+                    </div>
+                </a>
 
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
+                <!-- NAVIGATION -->
+                <nav class="d-none d-lg-block">
+                    <ul class="nav">
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                        <li class="nav-item"><a class="nav-link @(IsActive("Index"))" href="/">Accueil</a></li>
 
-                    <!-- Right side (Login / Logout) -->
-                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item"><a class="nav-link @(IsActive("Pourquoi"))" href="/Home/Pourquoi">Pourquoi</a></li>
 
-                        @if (User.Identity != null && User.Identity.IsAuthenticated)
-                        {
-                            <!-- Show email + role -->
-                            <li class="nav-item d-flex align-items-center me-2">
-                                <span class="text-dark fw-bold">
-                                    @User.Identity.Name
-                                </span>
+                        <li class="nav-item"><a class="nav-link @(IsActive("Temoignages"))" href="/Home/Temoignages">Témoignages</a></li>
 
-                                <span class="badge bg-primary ms-2">
-                                    @User.FindFirst(ClaimTypes.Role)?.Value
-                                </span>
-                            </li>
+                        <li class="nav-item"><a class="nav-link @(IsActive("CommentCaMarche"))" href="/Home/CommentCaMarche">Comment ça marche</a></li>
 
-                            <!-- Logout -->
-                            <li class="nav-item">
-                                <a class="btn btn-outline-danger" asp-controller="Account" asp-action="Logout">Déconnexion</a>
-                            </li>
-                        }
-                        else
-                        {
-                            <!-- Login -->
-                            <li class="nav-item">
-                                <a class="btn btn-success" asp-controller="Account" asp-action="Login">Connexion</a>
-                            </li>
+                        <li class="nav-item"><a class="nav-link @(IsActive("Galerie"))" href="/Home/Galerie">Galerie</a></li>
 
-                            <!-- Register -->
-                            <li class="nav-item ms-2">
-                                <a class="btn btn-primary" asp-controller="Account" asp-action="Register">Inscription</a>
-                            </li>
-                        }
+                        <li class="nav-item"><a class="nav-link @(IsActive("FAQ"))" href="/Home/FAQ">FAQ</a></li>
+
+                        <li class="nav-item"><a class="nav-link @(IsActive("Technologies"))" href="/Home/Technologies">Technologies</a></li>
 
                     </ul>
+                </nav>
 
-                </div>
             </div>
-        </nav>
+
+            <!-- RIGHT SIDE AUTH -->
+            <div class="d-flex align-items-center gap-2">
+
+                @if (User.Identity?.IsAuthenticated ?? false)
+                {
+                    <div class="d-none d-md-block text-end me-2">
+                        <div class="fw-semibold">@User.Identity?.Name</div>
+                        <small class="text-muted">@User.FindFirst(ClaimTypes.Role)?.Value</small>
+                    </div>
+
+                    <a href="/Account/Logout" class="btn btn-outline-danger btn-sm">Déconnexion</a>
+                }
+                else
+                {
+                    <a href="/Account/Login" class="btn btn-sm btn-primary">Connexion</a>
+                    <a href="/Account/Register" class="btn btn-sm btn-outline-primary">Inscription</a>
+                }
+
+            </div>
+        </div>
+
     </header>
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - SmartQuiz - <a asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <!-- ---------------- MAIN CONTENT ---------------- -->
+    <main class="public-main fade-up">
+        @RenderBody()
+    </main>
+
+    <footer class="text-center text-muted py-4">
+        <small>© @DateTime.UtcNow.Year SmartQuiz — Plateforme d'enseignement | <a href="/Home/Privacy">Confidentialité</a></small>
     </footer>
 
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Fade animation
+        document.addEventListener("DOMContentLoaded", () => {
+            document.querySelectorAll(".fade-up").forEach((el, i) => {
+                setTimeout(() => el.classList.add("show"), 60 * i);
+            });
+        });
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
+
 </body>
 </html>
+
+@functions {
+    public string IsActive(string action)
+    {
+        return ViewContext.RouteData.Values["action"]?.ToString() == action ? "active" : "";
+    }
+}

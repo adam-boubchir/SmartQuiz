@@ -1,66 +1,66 @@
 @model SmartQuiz.Models.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard Admin";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
 
-<div class="mb-8">
-    <h2 class="text-4xl font-bold text-gray-800">Tableau de bord Administrateur</h2>
-    <p class="text-gray-500 mt-1">Bienvenue sur l’espace d’administration</p>
+<div class="fade-up mb-4">
+    <h2 class="fw-bold text-dark">Dashboard Administrateur</h2>
+    <p class="text-muted">Aperçu global de la plateforme SmartQuiz</p>
 </div>
 
-<!-- GRID DES STATS -->
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="row g-3 fade-up">
 
-    <!-- CARD -->
-    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition">
-        <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-700">Total Utilisateurs</h3>
-            <div class="p-3 rounded-xl bg-blue-100">
-                <i class="fa-solid fa-users text-blue-600 text-xl"></i>
+    <!-- TOTAL UTILISATEURS -->
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Total Utilisateurs</small>
+            <h3 class="mt-2">@Model.TotalUsers</h3>
+            <div class="mt-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary">Voir</span>
             </div>
         </div>
-        <p class="mt-3 text-4xl font-bold text-blue-600">@Model.TotalUsers</p>
     </div>
 
-    <!-- CARD -->
-    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition">
-        <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-700">Enseignants</h3>
-            <div class="p-3 rounded-xl bg-green-100">
-                <i class="fa-solid fa-chalkboard-user text-green-600 text-xl"></i>
+    <!-- ENSEIGNANTS -->
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Enseignants</small>
+            <h3 class="mt-2">@Model.Teachers</h3>
+            <div class="mt-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary">Détails</span>
             </div>
         </div>
-        <p class="mt-3 text-4xl font-bold text-green-600">@Model.Teachers</p>
     </div>
 
-    <!-- CARD -->
-    <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 hover:shadow-xl transition">
-        <div class="flex items-center justify-between">
-            <h3 class="text-lg font-semibold text-gray-700">Étudiants</h3>
-            <div class="p-3 rounded-xl bg-purple-100">
-                <i class="fa-solid fa-user-graduate text-purple-600 text-xl"></i>
+    <!-- ÉTUDIANTS -->
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">Étudiants</small>
+            <h3 class="mt-2">@Model.Students</h3>
+            <div class="mt-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary">Suivi</span>
             </div>
         </div>
-        <p class="mt-3 text-4xl font-bold text-purple-600">@Model.Students</p>
+    </div>
+
+    <!-- EN ATTENTE -->
+    <div class="col-6 col-md-3">
+        <div class="card-stat p-3">
+            <small class="text-muted">En Attente</small>
+            <h3 class="mt-2 text-warning">@Model.Pending</h3>
+            <div class="mt-2">
+                <a href="/Admin/PendingUsers" class="badge bg-warning bg-opacity-10 text-warning text-decoration-none">
+                    Gérer
+                </a>
+            </div>
+        </div>
     </div>
 
 </div>
 
-<!-- Comptes en attente -->
-<div class="mt-10 bg-white rounded-2xl shadow-lg p-8 border border-gray-100 hover:shadow-xl transition">
-
-    <div class="flex items-center justify-between">
-        <h3 class="text-2xl font-semibold text-gray-700">Comptes en attente de validation</h3>
-        <div class="p-3 rounded-xl bg-orange-100">
-            <i class="fa-solid fa-clock text-orange-600 text-xl"></i>
-        </div>
-    </div>
-
-    <p class="text-5xl mt-4 font-bold text-orange-500">@Model.Pending</p>
-
-    <a href="/Admin/PendingUsers"
-      class="inline-block mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition">
-      ⚙️ Gérer les utilisateurs en attente
+<div class="fade-up mt-4">
+    <a href="/Admin/Users" class="btn btn-primary rounded-pill px-4">
+        Gérer tous les utilisateurs
     </a>
-
 </div>
-
-<!-- Import font awesome si non présent -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
