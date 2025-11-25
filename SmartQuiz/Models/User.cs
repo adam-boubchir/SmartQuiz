@@ -33,6 +33,8 @@ namespace SmartQuiz.Models
         public bool IsApproved { get; set; } = false;
 
         [BsonElement("avatarPath")]
+
+        public string ProfileImage { get; set; }
         public string AvatarPath { get; set; }
 
     }
