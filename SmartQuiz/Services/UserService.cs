@@ -26,7 +26,28 @@ namespace SmartQuiz.Services
 
             _users.Indexes.CreateOne(new CreateIndexModel<User>(indexKeys, indexOptions));
         }
+        public async Task<List<User>> GetAllAsync()
+        {
+            return await _users.Find(_ => true).ToListAsync();
+        }
 
+        public async Task CreateAsync(User user)
+        {
+            await _users.InsertOneAsync(user);
+        }
+
+        // ⭐ Méthode manquante — maintenant implémentée
+        public async Task UpdateAsync(User user)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+            await _users.ReplaceOneAsync(filter, user);
+        }
+
+        public async Task DeleteAsync(string id)
+        {
+            var filter = Builders<User>.Filter.Eq(u => u.Id, ObjectId.Parse(id));
+            await _users.DeleteOneAsync(filter);
+        }
         // 🔍 Récupère user via email
         public async Task<User> GetByEmail(string email)
         {

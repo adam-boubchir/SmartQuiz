@@ -55,6 +55,9 @@ namespace SmartQuiz
             // ⭐ IMPORTANT
             services.AddScoped<IStudentAnswerService, StudentAnswerService>();
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<ITeacherService, TeacherService>();
+            services.AddScoped<IStudentProfileService, StudentProfileService>();
+
             // -------------------------------------------------------
             // 3️⃣  SESSION
             // -------------------------------------------------------
@@ -94,6 +97,10 @@ namespace SmartQuiz
             // -------------------------------------------------------
             services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<IMongoClient>(sp =>
+    new MongoClient(Configuration["MongoDB:ConnectionString"])
+);
+
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer dbInit)
