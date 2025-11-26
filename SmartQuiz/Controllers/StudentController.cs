@@ -15,17 +15,23 @@ namespace SmartQuiz.Controllers
         private readonly ITpService _tpService;
         private readonly IStudentAnswerService _studentAnswerService;
         private readonly IUserService _userService;
+        private readonly ITeacherService _teacherService;
+        private readonly IStudentProfileService _studentProfileService;
 
         public StudentController(
             IQuizService quizService,
             ITpService tpService,
             IStudentAnswerService studentAnswerService,
+            ITeacherService teacherService,
+            IStudentProfileService studentProfileService,
             IUserService userService)
         {
             _quizService = quizService;
             _tpService = tpService;
             _studentAnswerService = studentAnswerService;
             _userService = userService;
+            _teacherService = teacherService;
+            _studentProfileService = studentProfileService;
         }
 
         private string GetUserId()
@@ -44,7 +50,6 @@ namespace SmartQuiz.Controllers
             if (student == null)
                 return Unauthorized();
 
-            // Quizzes & TP de tous les profs
             var quizzes = await _quizService.GetByTeachersAsync(student.TeacherIds);
             var tps = await _tpService.GetByTeachersAsync(student.TeacherIds);
 
@@ -100,6 +105,71 @@ namespace SmartQuiz.Controllers
             await _studentAnswerService.SaveAnswerAsync(answer);
 
             return RedirectToAction("MyResults");
+        }
+
+        // ======================================
+        //  PROFIL ÉTUDIANT
+        // ======================================
+        public async Task<IActionResult> Profile()
+        {
+            var userId = GetUserId();
+            var vm = await _studentProfileService.GetProfileAsync(userId);
+            if (vm == null) return NotFound();
+            return View(vm);
+        }
+
+        // PROFILE - POST update basic info
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProfileUpdate(ProfileUpdateModel model)
+        {
+            var userId = GetUserId();
+            await _studentProfileService.UpdateProfileAsync(userId, model);
+            TempData["Success"] = "Profil mis à jour.";
+            return RedirectToAction("Profile");
+        }
+
+        // CHANGE PASSWORD
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+        {
+            if (model.NewPassword != model.ConfirmNewPassword)
+            {
+                TempData["Error"] = "La confirmation du mot de passe ne correspond pas.";
+                return RedirectToAction("Profile");
+            }
+
+            var userId = GetUserId();
+            try
+            {
+                await _studentProfileService.ChangePasswordAsync(userId, model.OldPassword, model.NewPassword);
+                TempData["Success"] = "Mot de passe modifié.";
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = ex.Message;
+            }
+
+            return RedirectToAction("Profile");
+        }
+
+        // UPLOAD AVATAR
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UploadAvatar(IFormFile avatar)
+        {
+            if (avatar == null)
+            {
+                TempData["Error"] = "Fichier manquant.";
+                return RedirectToAction("Profile");
+            }
+
+            var userId = GetUserId();
+            await _studentProfileService.UploadAvatarAsync(userId, avatar);
+
+            TempData["Success"] = "Avatar mis à jour.";
+            return RedirectToAction("Profile");
         }
 
         // ======================================

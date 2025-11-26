@@ -12,5 +12,13 @@ namespace SmartQuiz.Services
         Task DeleteUser(string id);
         Task ActivateUser(string id);
         Task<List<User>> GetPendingUsers();
+        Task<bool> UpdateBasicInfoAsync(string userId, string username, string email);
+        Task CreateAsync(User user);
+        Task UpdateAsync(User user);
+        Task UpdateProfileImageAsync(string userId, string imageUrl);
+
+        // password helpers
+        string HashPassword(string password);
+        bool CheckPassword(string enteredPassword, string storedHash);
     }
 }

@@ -18,16 +18,22 @@ namespace SmartQuiz.Services
             CreateIndexes();
         }
 
-        // 🔒 Index unique sur email
+        // Index email unique
         private void CreateIndexes()
         {
             var indexKeys = Builders<User>.IndexKeys.Ascending(u => u.Email);
             var indexOptions = new CreateIndexOptions { Unique = true };
-
             _users.Indexes.CreateOne(new CreateIndexModel<User>(indexKeys, indexOptions));
         }
 
-        // 🔍 Récupère user via email
+        // GET user by ID
+        public async Task<User> GetByIdAsync(string id)
+        {
+            var objectId = ObjectId.Parse(id);
+            return await _users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
+        }
+
+        // GET user by Email
         public async Task<User> GetByEmail(string email)
         {
             return await _users
@@ -35,65 +41,84 @@ namespace SmartQuiz.Services
                 .FirstOrDefaultAsync();
         }
 
-        // ➕ Crée un utilisateur
+        // Create USER (legacy name)
         public async Task CreateUser(User user)
         {
             user.PasswordHash = HashPassword(user.PasswordHash);
-
-            try
-            {
-                await _users.InsertOneAsync(user);
-            }
-            catch (MongoWriteException ex)
-                when (ex.WriteError.Category == ServerErrorCategory.DuplicateKey)
-            {
-                throw new Exception("Un utilisateur avec cet email existe déjà.");
-            }
+            await _users.InsertOneAsync(user);
         }
 
-        // 🔒 Hash sécurisé BCrypt
-        public string HashPassword(string password)
+        // CreateAsync (from interface)
+        public async Task CreateAsync(User user)
         {
-            return BCrypt.Net.BCrypt.HashPassword(password);
+            user.PasswordHash = HashPassword(user.PasswordHash);
+            await _users.InsertOneAsync(user);
         }
 
-        // ✔️ Vérification mot de passe
-        public bool CheckPassword(string enteredPassword, string storedHash)
+        // UPDATE full user
+        public async Task UpdateAsync(User user)
         {
-            return BCrypt.Net.BCrypt.Verify(enteredPassword, storedHash);
+            var filter = Builders<User>.Filter.Eq(u => u.Id, user.Id);
+            await _users.ReplaceOneAsync(filter, user);
         }
 
-        // ✅ Récupérer tous les utilisateurs
+        // Update basic info: username + email
+        public async Task<bool> UpdateBasicInfoAsync(string userId, string username, string email)
+        {
+            var objectId = ObjectId.Parse(userId);
+
+            var update = Builders<User>.Update
+                .Set(u => u.Username, username)
+                .Set(u => u.Email, email);
+
+            var result = await _users.UpdateOneAsync(u => u.Id == objectId, update);
+
+            return result.ModifiedCount > 0;
+        }
+
+        // Update profile image
+        public async Task UpdateProfileImageAsync(string userId, string imageUrl)
+        {
+            var objectId = ObjectId.Parse(userId);
+
+            var update = Builders<User>.Update
+                .Set(u => u.ProfileImage, imageUrl);
+
+            await _users.UpdateOneAsync(u => u.Id == objectId, update);
+        }
+
+        // Get ALL users
         public async Task<List<User>> GetAllUsers()
         {
-            return await _users.Find(u => true).ToListAsync();
+            return await _users.Find(_ => true).ToListAsync();
         }
 
-        // ❌ Supprimer un utilisateur par string id
+        // Delete user
         public async Task DeleteUser(string id)
         {
-            var objectId = ObjectId.Parse(id); // conversion string -> ObjectId
+            var objectId = ObjectId.Parse(id);
             await _users.DeleteOneAsync(u => u.Id == objectId);
         }
 
-        // ✔️ Activer un utilisateur par string id
+        // Activate user
         public async Task ActivateUser(string id)
         {
-            var objectId = ObjectId.Parse(id); // conversion string -> ObjectId
+            var objectId = ObjectId.Parse(id);
             var update = Builders<User>.Update.Set(u => u.IsApproved, true);
             await _users.UpdateOneAsync(u => u.Id == objectId, update);
         }
-        public async Task<User> GetByIdAsync(string id)
-        {
-            var objectId = ObjectId.Parse(id);
-            return await _users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
-        }
 
+        // Pending users
         public async Task<List<User>> GetPendingUsers()
         {
             return await _users.Find(u => u.IsApproved == false).ToListAsync();
         }
-        
 
+        // Password helpers
+        public string HashPassword(string password) =>
+            BCrypt.Net.BCrypt.HashPassword(password);
+
+        public bool CheckPassword(string enteredPassword, string storedHash) =>
+            BCrypt.Net.BCrypt.Verify(enteredPassword, storedHash);
     }
 }
