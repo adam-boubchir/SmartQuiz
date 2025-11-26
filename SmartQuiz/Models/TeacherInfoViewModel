@@ -1,0 +1,15 @@
+using System;
+
+namespace SmartQuiz.Models
+{
+    public class TeacherInfoViewModel
+    {
+        public string Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public int GroupsCount { get; set; }
+        public int StudentsCount { get; set; }
+        public int QuizCount { get; set; }
+        public int TpCount { get; set; }
+    }
+}

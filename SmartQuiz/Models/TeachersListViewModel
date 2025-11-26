@@ -1,0 +1,9 @@
+using System.Collections.Generic;
+
+namespace SmartQuiz.Models
+{
+    public class TeachersListViewModel
+    {
+        public List<TeacherInfoViewModel> Teachers { get; set; } = new List<TeacherInfoViewModel>();
+    }
+}

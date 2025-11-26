@@ -1,6 +1,5 @@
 ﻿using SmartQuiz.Models;
 using System.Threading.Tasks;
-using SmartQuiz.Models;
 
 namespace SmartQuiz.Services
 {

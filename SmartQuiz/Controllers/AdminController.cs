@@ -3,6 +3,7 @@ using SmartQuiz.Services;
 using SmartQuiz.Models;
 using Microsoft.AspNetCore.Http;
 
+
 namespace SmartQuiz.Controllers
 {
     public class AdminController : Controller
@@ -91,5 +92,39 @@ namespace SmartQuiz.Controllers
 
             return View(model);
         }
+
+        public async Task<IActionResult> Teachers()
+{
+    var email = HttpContext.Session.GetString("UserEmail");
+    if (email == null) return RedirectToAction("Login", "Account");
+
+    var currentUser = await _userService.GetByEmail(email);
+    if (currentUser == null || currentUser.Role != "Admin")
+        return Content("⛔ Accès refusé");
+    if (!currentUser.IsApproved)
+        return Content("⛔ Votre compte admin est en attente de validation.");
+
+    var allUsers = await _userService.GetAllUsers();
+    var teachersList = allUsers.Where(u => u.Role == "Teacher").ToList();
+
+    var model = new SmartQuiz.Models.TeachersListViewModel();
+
+    foreach (var teacher in teachersList)
+    {
+        model.Teachers.Add(new SmartQuiz.Models.TeacherInfoViewModel
+        {
+            Id = teacher.Id.ToString(),
+            Username = teacher.Username,
+            Email = teacher.Email,
+            GroupsCount = 0,
+            StudentsCount = 0,
+            QuizCount = 0,
+            TpCount = 0
+        });
+    }
+
+    return View(model);
+}
+
     }
 }
