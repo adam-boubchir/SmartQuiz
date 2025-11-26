@@ -11,11 +11,6 @@
     <Compile Remove="Views\Student\Interface.cs" />
   </ItemGroup>
 
-<ItemGroup>
-  <Compile Include="Models\TeachersListViewModel.cs" />
-  <Compile Include="Models\TeacherInfoViewModel.cs" />
-</ItemGroup>
-
   <ItemGroup>
     <Content Remove="Views\Student\Index1.cshtml" />
     <Content Remove="Views\Student\QuizDetail.cshtml" />

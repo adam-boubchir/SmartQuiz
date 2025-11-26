@@ -9,11 +9,51 @@ namespace SmartQuiz.Controllers
     public class AdminController : Controller
     {
         private readonly UserService _userService;
+        private readonly StudentService _studentService;
+        private readonly GroupService _groupService;
 
-        public AdminController(UserService userService)
+        public AdminController(UserService userService, StudentService studentService, GroupService groupService)
         {
             _userService = userService;
+            _studentService = studentService;
+            _groupService = groupService;
         }
+
+        // 🎯 PAGE Students avec statistiques avancées
+    public async Task<IActionResult> Students()
+    {
+        // Chargement des données
+        var students = await _studentService.GetAllAsync();
+        var groups = await _groupService.GetByTeacherAsync(""); // all groups si pas filtré
+        var allGroups = await _groupService.GetByTeacherAsync(null); // modifie selon ton implementation
+
+        // Statistiques avancées
+        int totalGroups = allGroups.Count;
+        int studentsWithoutGroup = students.Count(s => s.GroupIds == null || s.GroupIds.Count == 0);
+        int average = totalGroups == 0 ? 0 : students.Count / totalGroups;
+
+        var model = new AdminStudentsViewModel
+        {
+            TotalStudents = students.Count,
+            TotalGroups = totalGroups,
+            StudentsWithoutGroup = studentsWithoutGroup,
+            AverageStudentsPerGroup = average,
+            Students = students.Select(s => new StudentInfoViewModel
+            {
+                Id = s.Id,
+                FullName = s.FullName,
+                Email = s.Email,
+                GroupName = "TODO"
+            }).ToList(),
+            Groups = allGroups.Select(g => new GroupViewModel
+            {
+                Id = g.Id,
+                Name = g.Name
+            }).ToList()
+        };
+
+        return View(model);
+    }
 
         // ✅ PAGE USERS (tous les utilisateurs, sécurisée)
         public async Task<IActionResult> Users()
@@ -93,38 +133,7 @@ namespace SmartQuiz.Controllers
             return View(model);
         }
 
-        public async Task<IActionResult> Teachers()
-{
-    var email = HttpContext.Session.GetString("UserEmail");
-    if (email == null) return RedirectToAction("Login", "Account");
-
-    var currentUser = await _userService.GetByEmail(email);
-    if (currentUser == null || currentUser.Role != "Admin")
-        return Content("⛔ Accès refusé");
-    if (!currentUser.IsApproved)
-        return Content("⛔ Votre compte admin est en attente de validation.");
-
-    var allUsers = await _userService.GetAllUsers();
-    var teachersList = allUsers.Where(u => u.Role == "Teacher").ToList();
-
-    var model = new SmartQuiz.Models.TeachersListViewModel();
-
-    foreach (var teacher in teachersList)
-    {
-        model.Teachers.Add(new SmartQuiz.Models.TeacherInfoViewModel
-        {
-            Id = teacher.Id.ToString(),
-            Username = teacher.Username,
-            Email = teacher.Email,
-            GroupsCount = 0,
-            StudentsCount = 0,
-            QuizCount = 0,
-            TpCount = 0
-        });
-    }
-
-    return View(model);
-}
+        
 
     }
 }
