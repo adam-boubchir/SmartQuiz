@@ -23,18 +23,21 @@ namespace SmartQuiz.Controllers
         // 🎯 PAGE Students avec statistiques avancées
         public async Task<IActionResult> Students()
         {
-            // Récupération des étudiants
-            var students = await _studentService.GetAllAsync();
+            // 1️⃣ Récupérer tous les utilisateurs
+            var allUsers = await _userService.GetAllUsers();
 
-            // Récupération des groupes (null = tous les groupes)
-            var allGroups = await _groupService.GetByTeacherAsync(null);
+            // 2️⃣ Filtrer uniquement les étudiants
+            var students = allUsers.Where(u => u.Role == "Student").ToList();
 
-            // Statistiques
+            // 3️⃣ Récupérer tous les groupes
+            var allGroups = await _groupService.GetAllAsync();
+
+            // 4️⃣ Statistiques
             int totalGroups = allGroups.Count;
-            int studentsWithoutGroup = students.Count(s => s.GroupIds == null || s.GroupIds.Count == 0);
+            int studentsWithoutGroup = students.Count(s => string.IsNullOrEmpty(s.GroupId));
             int average = totalGroups == 0 ? 0 : students.Count / totalGroups;
 
-            // Préparer le modèle pour la vue
+            // 5️⃣ Préparer le modèle pour la vue
             var model = new AdminStudentsViewModel
             {
                 TotalStudents = students.Count,
@@ -43,13 +46,12 @@ namespace SmartQuiz.Controllers
                 AverageStudentsPerGroup = average,
                 Students = students.Select(s => new StudentInfoViewModel
                 {
-                    Id = s.Id,
-                    FullName = s.FullName,
+                    Id = s.Id.ToString(),
+                    FullName = s.Username,
                     Email = s.Email,
-                    // Optionnel : récupérer le nom du groupe principal
-                    GroupName = s.GroupIds != null && s.GroupIds.Count > 0
-                        ? allGroups.FirstOrDefault(g => g.Id == s.GroupIds[0])?.Name ?? "Non attribué"
-                        : "Non attribué"
+                    GroupName = string.IsNullOrEmpty(s.GroupId)
+                        ? "Non attribué"
+                        : allGroups.FirstOrDefault(g => g.Id == s.GroupId)?.Name ?? "Non attribué"
                 }).ToList(),
                 Groups = allGroups.Select(g => new GroupViewModel
                 {
@@ -138,3 +140,4 @@ namespace SmartQuiz.Controllers
         }
     }
 }
+

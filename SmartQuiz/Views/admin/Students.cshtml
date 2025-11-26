@@ -15,28 +15,44 @@
     <div class="col-md-3">
         <div class="card-stat p-3">
             <small class="text-muted">Total Étudiants</small>
-            <h3>@Model.TotalStudents</h3>
+            <h3>
+                <a asp-action="Students" asp-controller="Admin" class="text-decoration-none text-dark">
+                    @Model.TotalStudents
+                </a>
+            </h3>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="card-stat p-3">
             <small class="text-muted">Groupes</small>
-            <h3>@Model.TotalGroups</h3>
+            <h3>
+                <a asp-action="AllGroups" asp-controller="Admin" class="text-decoration-none text-dark">
+                    @Model.TotalGroups
+                </a>
+            </h3>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="card-stat p-3">
             <small class="text-muted">Étudiants sans groupe</small>
-            <h3 class="text-danger">@Model.StudentsWithoutGroup</h3>
+            <h3>
+                <a asp-action="StudentsWithoutGroup" asp-controller="Admin" class="text-decoration-none text-danger">
+                    @Model.StudentsWithoutGroup
+                </a>
+            </h3>
         </div>
     </div>
 
     <div class="col-md-3">
         <div class="card-stat p-3">
             <small class="text-muted">Moyenne Étudiants / Groupe</small>
-            <h3>@Model.AverageStudentsPerGroup</h3>
+            <h3>
+                <a asp-action="AveragePerGroup" asp-controller="Admin" class="text-decoration-none text-dark">
+                    @Model.AverageStudentsPerGroup
+                </a>
+            </h3>
         </div>
     </div>
 

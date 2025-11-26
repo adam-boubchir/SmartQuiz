@@ -67,5 +67,11 @@ namespace SmartQuiz.Services
         {
             await _collection.DeleteOneAsync(g => g.Id == id);
         }
+
+        public async Task<List<Group>> GetAllAsync()
+    {
+    return await _collection.Find(_ => true).ToListAsync();
+    }
+
     }
 }
