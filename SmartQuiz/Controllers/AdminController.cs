@@ -2,7 +2,8 @@
 using SmartQuiz.Services;
 using SmartQuiz.Models;
 using Microsoft.AspNetCore.Http;
-
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace SmartQuiz.Controllers
 {
@@ -20,40 +21,45 @@ namespace SmartQuiz.Controllers
         }
 
         // 🎯 PAGE Students avec statistiques avancées
-    public async Task<IActionResult> Students()
-    {
-        // Chargement des données
-        var students = await _studentService.GetAllAsync();
-        var groups = await _groupService.GetByTeacherAsync(""); // all groups si pas filtré
-        var allGroups = await _groupService.GetByTeacherAsync(null); // modifie selon ton implementation
-
-        // Statistiques avancées
-        int totalGroups = allGroups.Count;
-        int studentsWithoutGroup = students.Count(s => s.GroupIds == null || s.GroupIds.Count == 0);
-        int average = totalGroups == 0 ? 0 : students.Count / totalGroups;
-
-        var model = new AdminStudentsViewModel
+        public async Task<IActionResult> Students()
         {
-            TotalStudents = students.Count,
-            TotalGroups = totalGroups,
-            StudentsWithoutGroup = studentsWithoutGroup,
-            AverageStudentsPerGroup = average,
-            Students = students.Select(s => new StudentInfoViewModel
-            {
-                Id = s.Id,
-                FullName = s.FullName,
-                Email = s.Email,
-                GroupName = "TODO"
-            }).ToList(),
-            Groups = allGroups.Select(g => new GroupViewModel
-            {
-                Id = g.Id,
-                Name = g.Name
-            }).ToList()
-        };
+            // Récupération des étudiants
+            var students = await _studentService.GetAllAsync();
 
-        return View(model);
-    }
+            // Récupération des groupes (null = tous les groupes)
+            var allGroups = await _groupService.GetByTeacherAsync(null);
+
+            // Statistiques
+            int totalGroups = allGroups.Count;
+            int studentsWithoutGroup = students.Count(s => s.GroupIds == null || s.GroupIds.Count == 0);
+            int average = totalGroups == 0 ? 0 : students.Count / totalGroups;
+
+            // Préparer le modèle pour la vue
+            var model = new AdminStudentsViewModel
+            {
+                TotalStudents = students.Count,
+                TotalGroups = totalGroups,
+                StudentsWithoutGroup = studentsWithoutGroup,
+                AverageStudentsPerGroup = average,
+                Students = students.Select(s => new StudentInfoViewModel
+                {
+                    Id = s.Id,
+                    FullName = s.FullName,
+                    Email = s.Email,
+                    // Optionnel : récupérer le nom du groupe principal
+                    GroupName = s.GroupIds != null && s.GroupIds.Count > 0
+                        ? allGroups.FirstOrDefault(g => g.Id == s.GroupIds[0])?.Name ?? "Non attribué"
+                        : "Non attribué"
+                }).ToList(),
+                Groups = allGroups.Select(g => new GroupViewModel
+                {
+                    Id = g.Id,
+                    Name = g.Name
+                }).ToList()
+            };
+
+            return View(model);
+        }
 
         // ✅ PAGE USERS (tous les utilisateurs, sécurisée)
         public async Task<IActionResult> Users()
@@ -74,7 +80,6 @@ namespace SmartQuiz.Controllers
             if (!currentUser.IsApproved)
                 return Content("⛔ Votre compte admin est en attente de validation.");
 
-            // Affichage de tous les utilisateurs
             var users = await _userService.GetAllUsers();
             return View(users);
         }
@@ -98,7 +103,6 @@ namespace SmartQuiz.Controllers
             if (!currentUser.IsApproved)
                 return Content("⛔ Votre compte admin est en attente de validation.");
 
-            // Seulement les comptes non approuvés
             var users = await _userService.GetPendingUsers();
             return View(users);
         }
@@ -132,8 +136,5 @@ namespace SmartQuiz.Controllers
 
             return View(model);
         }
-
-        
-
     }
 }

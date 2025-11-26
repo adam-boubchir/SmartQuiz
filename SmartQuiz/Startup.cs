@@ -46,6 +46,9 @@ namespace SmartQuiz
             services.AddSingleton<DatabaseInitializer>();
             services.AddSingleton<MongoDbService>();
           
+            // Après (correct)
+            services.AddScoped<StudentService>();
+            services.AddScoped<GroupService>();
 
      
             services.AddScoped<IQuizService, QuizService>();
