@@ -19,20 +19,22 @@ namespace SmartQuiz.Controllers
             _env = env;
         }
 
-        // ⚡ Affiche le profil
+        // -------------------------------------------------------
+        // PAGE PROFIL
+        // -------------------------------------------------------
         public async Task<IActionResult> Index()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
             if (userId == null)
                 return RedirectToAction("Login", "Account");
 
             var user = await _userService.GetByIdAsync(userId);
-
             return View(user);
         }
 
-        // ⚡ Mise à jour des informations (sans image)
+        // -------------------------------------------------------
+        // UPDATE BASIC INFO
+        // -------------------------------------------------------
         [HttpPost]
         public async Task<IActionResult> UpdateProfile(string username, string email)
         {
@@ -40,11 +42,50 @@ namespace SmartQuiz.Controllers
 
             await _userService.UpdateBasicInfoAsync(userId, username, email);
 
-            TempData["Success"] = "Profil mis à jour !";
+            TempData["SuccessMessage"] = "✔ Profil mis à jour !";
             return RedirectToAction("Index");
         }
 
-        // ⚡ Upload de la photo de profil
+        // -------------------------------------------------------
+        // CHANGE PASSWORD
+        // -------------------------------------------------------
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(string oldPassword, string newPassword, string confirmPassword)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                TempData["ErrorMessage"] = "Utilisateur introuvable.";
+                return RedirectToAction("Index");
+            }
+
+            // Vérification : new != confirm
+            if (newPassword != confirmPassword)
+            {
+                TempData["ErrorMessage"] = "❌ Les mots de passe ne correspondent pas.";
+                return RedirectToAction("Index");
+            }
+
+            var user = await _userService.GetByIdAsync(userId);
+
+            // Vérifier ancien mot de passe
+            if (!_userService.CheckPassword(oldPassword, user.PasswordHash))
+            {
+                TempData["ErrorMessage"] = "❌ Ancien mot de passe incorrect.";
+                return RedirectToAction("Index");
+            }
+
+            // Hash & save
+            user.PasswordHash = _userService.HashPassword(newPassword);
+            await _userService.UpdateAsync(user);
+
+            TempData["SuccessMessage"] = "✔ Mot de passe changé avec succès !";
+            return RedirectToAction("Index");
+        }
+
+        // -------------------------------------------------------
+        // UPLOAD PROFILE IMAGE
+        // -------------------------------------------------------
         [HttpPost]
         public async Task<IActionResult> UploadImage(IFormFile profileImage)
         {
@@ -65,18 +106,23 @@ namespace SmartQuiz.Controllers
                 }
 
                 string imageUrl = "/uploads/" + fileName;
-
                 await _userService.UpdateProfileImageAsync(userId, imageUrl);
 
-                // Mise à jour de la claim ProfileImage
+                // mise à jour de la claim ProfileImage
                 var identity = (ClaimsIdentity)User.Identity;
-                identity.RemoveClaim(identity.FindFirst("ProfileImage"));
+
+                var existingClaim = identity.FindFirst("ProfileImage");
+                if (existingClaim != null)
+                    identity.RemoveClaim(existingClaim);
+
                 identity.AddClaim(new Claim("ProfileImage", imageUrl));
 
-                await HttpContext.SignInAsync(new ClaimsPrincipal(identity));
+                await HttpContext.SignInAsync(
+                    new ClaimsPrincipal(identity)
+                );
             }
 
-            TempData["Success"] = "Photo de profil mise à jour !";
+            TempData["SuccessMessage"] = "✔ Photo de profil mise à jour !";
             return RedirectToAction("Index");
         }
     }

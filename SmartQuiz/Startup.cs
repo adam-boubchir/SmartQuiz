@@ -1,7 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+<<<<<<< HEAD
+<<<<<<< HEAD
+using Microsoft.AspNetCore.Http;  // <-- IMPORTANT
+=======
 using Microsoft.AspNetCore.Http;
+>>>>>>> fc06b7dca9823d6e1b9ffdca421fd7b5f4e73bb1
+=======
+using Microsoft.AspNetCore.Http;
+>>>>>>> c72447d3ce621bbfd51f3ffeac9510f3e1752cc9
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -44,14 +52,24 @@ namespace SmartQuiz
             // 2️⃣  CORE SERVICES
             // -------------------------------------------------------
             services.AddSingleton<MongoDbService>();
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+=======
 //<<<<<<< HEAD
 //=======
+>>>>>>> c72447d3ce621bbfd51f3ffeac9510f3e1752cc9
           
             // Après (correct)
             services.AddScoped<StudentService>();
             services.AddScoped<GroupService>();
+<<<<<<< HEAD
+>>>>>>> ca067bfafc19f9fad9c01b105000b9bdc332e724
+
+=======
 
 
+>>>>>>> c72447d3ce621bbfd51f3ffeac9510f3e1752cc9
             // IMPORTANT : DatabaseInitializer doit être Scoped
             services.AddScoped<DatabaseInitializer>();
 
