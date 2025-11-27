@@ -44,16 +44,7 @@ namespace SmartQuiz
             // 2️⃣  CORE SERVICES
             // -------------------------------------------------------
             services.AddSingleton<MongoDbService>();
-//<<<<<<< HEAD
-//=======
           
-            // Après (correct)
-            services.AddScoped<StudentService>();
-            services.AddScoped<GroupService>();
-
-
-            // IMPORTANT : DatabaseInitializer doit être Scoped
-            services.AddScoped<DatabaseInitializer>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IQuizService, QuizService>();

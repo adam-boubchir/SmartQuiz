@@ -1,5 +1,6 @@
 ﻿using SmartQuiz.Models;
 using System.Threading.Tasks;
+using SmartQuiz.Models;
 
 namespace SmartQuiz.Services
 {
@@ -14,7 +15,6 @@ namespace SmartQuiz.Services
         Task<List<User>> GetPendingUsers();
         Task<bool> UpdateBasicInfoAsync(string userId, string username, string email);
         Task CreateAsync(User user);
-        
         Task UpdateAsync(User user);
         Task UpdateProfileImageAsync(string userId, string imageUrl);
 

@@ -13,58 +13,51 @@
 
     <!-- TOTAL UTILISATEURS -->
     <div class="col-6 col-md-3">
-        <a asp-controller="Admin" asp-action="Users" class="text-decoration-none">
-            <div class="card-stat p-3">
-                <small class="text-muted">Total Utilisateurs</small>
-                <h3 class="mt-2">@Model.TotalUsers</h3>
-                <div class="mt-2">
-                    <span class="badge bg-primary bg-opacity-10 text-primary">Voir</span>
-                </div>
+        <div class="card-stat p-3">
+            <small class="text-muted">Total Utilisateurs</small>
+            <h3 class="mt-2">@Model.TotalUsers</h3>
+            <div class="mt-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary">Voir</span>
             </div>
-        </a>
+        </div>
     </div>
 
     <!-- ENSEIGNANTS -->
     <div class="col-6 col-md-3">
-        <a asp-controller="Admin" asp-action="Teachers" class="text-decoration-none">
-            <div class="card-stat p-3">
-                <small class="text-muted">Enseignants</small>
-                <h3 class="mt-2">@Model.Teachers</h3>
-                <div class="mt-2">
-                    <span class="badge bg-primary bg-opacity-10 text-primary">Détails</span>
-                </div>
+        <div class="card-stat p-3">
+            <small class="text-muted">Enseignants</small>
+            <h3 class="mt-2">@Model.Teachers</h3>
+            <div class="mt-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary">Détails</span>
             </div>
-        </a>
+        </div>
     </div>
 
     <!-- ÉTUDIANTS -->
     <div class="col-6 col-md-3">
-        <a asp-controller="Admin" asp-action="Students" class="text-decoration-none">
-            <div class="card-stat p-3">
-                <small class="text-muted">Étudiants</small>
-                <h3 class="mt-2">@Model.Students</h3>
-                <div class="mt-2">
-                    <span class="badge bg-primary bg-opacity-10 text-primary">Suivi</span>
-                </div>
+        <div class="card-stat p-3">
+            <small class="text-muted">Étudiants</small>
+            <h3 class="mt-2">@Model.Students</h3>
+            <div class="mt-2">
+                <span class="badge bg-primary bg-opacity-10 text-primary">Suivi</span>
             </div>
-        </a>
+        </div>
     </div>
 
     <!-- EN ATTENTE -->
     <div class="col-6 col-md-3">
-        <a asp-controller="Admin" asp-action="PendingUsers" class="text-decoration-none">
-            <div class="card-stat p-3">
-                <small class="text-muted">En Attente</small>
-                <h3 class="mt-2 text-warning">@Model.Pending</h3>
-                <div class="mt-2">
-                    <span class="badge bg-warning bg-opacity-10 text-warning">Gérer</span>
-                </div>
+        <div class="card-stat p-3">
+            <small class="text-muted">En Attente</small>
+            <h3 class="mt-2 text-warning">@Model.Pending</h3>
+            <div class="mt-2">
+                <a href="/Admin/PendingUsers" class="badge bg-warning bg-opacity-10 text-warning text-decoration-none">
+                    Gérer
+                </a>
             </div>
-        </a>
+        </div>
     </div>
 
 </div>
-
 
 <div class="fade-up mt-4">
     <a href="/Admin/Users" class="btn btn-primary rounded-pill px-4">

@@ -2,7 +2,7 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SmartQuiz.Models;
-using YourProject.Models;
+
 namespace SmartQuiz.Services
 {
     public class UserService : IUserService
@@ -120,11 +120,5 @@ namespace SmartQuiz.Services
 
         public bool CheckPassword(string enteredPassword, string storedHash) =>
             BCrypt.Net.BCrypt.Verify(enteredPassword, storedHash);
-
-
-        
-        
-       
-        
     }
 }
