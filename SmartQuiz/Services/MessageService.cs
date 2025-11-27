@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SmartQuiz.Models;
 
 namespace SmartQuiz.Services
 {
@@ -154,8 +155,9 @@ namespace SmartQuiz.Services
                     LastMessage = lastMsg?.Content,
                     LastMessageAt = lastMsg?.SentAt,
                     UnreadCount = unread,
-                    AvatarPath = u.AvatarPath ?? u.ProfileImage
+                    ProfileImage = u.ProfileImage
                 });
+
             }
 
             // sort by last message date desc

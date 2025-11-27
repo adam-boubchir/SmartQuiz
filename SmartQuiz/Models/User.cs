@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 using System.Collections.Generic;
 
 namespace SmartQuiz.Models
@@ -19,23 +20,25 @@ namespace SmartQuiz.Models
         public string PasswordHash { get; set; }
 
         [BsonElement("role")]
-        public string Role { get; set; } // Admin - Teacher - Student
+        public string Role { get; set; } // Admin, Teacher, Student
 
-        // ⭐ Groupe de l'étudiant
+        // Student group
         [BsonElement("groupId")]
         public string GroupId { get; set; }
 
-        // ⭐⭐ Liste des enseignants associés (MULTI-TEACHERS)
+        // Multi teachers
         [BsonElement("teacherIds")]
         public List<string> TeacherIds { get; set; } = new List<string>();
 
         [BsonElement("isApproved")]
         public bool IsApproved { get; set; } = false;
 
-        [BsonElement("avatarPath")]
-
+        // Profile image only
+        [BsonElement("profileImage")]
         public string ProfileImage { get; set; }
-        public string AvatarPath { get; set; }
 
+        // Tracking
+        [BsonElement("createdAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }

@@ -1,4 +1,4 @@
-@model SmartQuiz.Models.AddGroupViewModel
+﻿@model SmartQuiz.Models.AddGroupViewModel
 @{
     ViewData["Title"] = "Ajouter un Groupe";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -20,12 +20,12 @@
     </div>
 
     <div class="mb-3">
-    <label class="form-label">Année</label>
-    <input asp-for="Annee" class="form-control" type="number" min="1" />
-    <small class="form-text text-muted">
-        @(Model.Annee == 1 ? "1ère année" : Model.Annee + "ème année")
-    </small>
-    <span asp-validation-for="Annee" class="text-danger"></span>
+        <label class="form-label">Année</label>
+        <input asp-for="Annee" class="form-control" type="number" min="1" />
+        <small class="form-text text-muted">
+            @(Model.Annee == 1 ? "1ère année" : Model.Annee + "ème année")
+        </small>
+        <span asp-validation-for="Annee" class="text-danger"></span>
     </div>
 
 
@@ -60,6 +60,6 @@
     <button type="submit" class="btn btn-success">Ajouter le groupe</button>
 </form>
 
-@section Scripts{
+@section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

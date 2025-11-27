@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SmartQuiz.Models
 {
@@ -23,8 +23,8 @@ namespace SmartQuiz.Models
         public string Subject { get; set; } = "";
 
         // ✅ Propriété calculée pour afficher "1ère année" ou "2ème année"
-         public string AnneeFormatee => Annee == 1 ? "1ère année" : Annee + "ème année";
+        public string AnneeFormatee => Annee == 1 ? "1ère année" : Annee + "ème année";
     }
 
-    
+
 }

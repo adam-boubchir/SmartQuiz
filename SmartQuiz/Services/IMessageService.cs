@@ -16,14 +16,5 @@ namespace SmartQuiz.Services
     }
 
 
-    public class ContactDto
-    {
-        public string UserId { get; set; }
-        public string DisplayName { get; set; } // username or email
-        public string Role { get; set; }
-        public string LastMessage { get; set; }
-        public DateTime? LastMessageAt { get; set; }
-        public int UnreadCount { get; set; }
-        public string AvatarPath { get; set; }
-    }
+    
 }

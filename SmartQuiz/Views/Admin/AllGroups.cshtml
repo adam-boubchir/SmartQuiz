@@ -1,4 +1,4 @@
-@model SmartQuiz.Models.AdminGroupsViewModel
+﻿@model SmartQuiz.Models.AdminGroupsViewModel
 
 @{
     ViewData["Title"] = "Groupes";
@@ -26,7 +26,7 @@
                 @foreach (var f in Model.Filieres)
                 {
                     <option value="@f" selected="@(Model.SelectedFiliere == f ? "selected" : null)">
-                    @f
+                        @f
                     </option>
 
                 }
@@ -34,25 +34,27 @@
         </div>
 
         <div class="col-md-4">
-    <label class="form-label">Année</label>
-    <select name="annee" class="form-select">
-    <option value="">-- Toutes les années --</option>
-    @foreach (var a in Model.Annees)
-    {
-        var suffix = a == 1 ? "ère" : "ème";
+            <label class="form-label">Année</label>
+            <select name="annee" class="form-select">
+                <option value="">-- Toutes les années --</option>
+                @foreach (var a in Model.Annees)
+                {
+                    var suffix = a == 1 ? "ère" : "ème";
 
-        if (Model.SelectedAnnee.HasValue && Model.SelectedAnnee.Value == a)
-        {
-            @:<option value="@a" selected>@a @suffix année</option>
-        }
-        else
-        {
-            @:<option value="@a">@a @suffix année</option>
-        }
-    }
-</select>
+                    if (Model.SelectedAnnee.HasValue && Model.SelectedAnnee.Value == a)
+                    {
+                        @:
+                        <option value="@a" selected>@a @suffix année</option>
+                    }
+                    else
+                    {
+                        @:
+                        <option value="@a">@a @suffix année</option>
+                    }
+                }
+            </select>
 
-</div>
+        </div>
 
 
         <div class="col-md-4">
