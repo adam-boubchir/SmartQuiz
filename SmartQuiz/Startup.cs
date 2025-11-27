@@ -28,7 +28,7 @@ namespace SmartQuiz
             services.AddControllersWithViews();
 
             // -------------------------------------------------------
-            // 1️⃣  MONGO DB
+            // 1️⃣ MONGO DB
             // -------------------------------------------------------
             services.AddSingleton<IMongoClient>(sp =>
                 new MongoClient(Configuration["MongoDB:ConnectionString"])
@@ -41,10 +41,9 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 2️⃣  CORE SERVICES
+            // 2️⃣ CORE SERVICES
             // -------------------------------------------------------
             services.AddSingleton<MongoDbService>();
-          
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IQuizService, QuizService>();
@@ -58,8 +57,6 @@ namespace SmartQuiz
             // 3️⃣ CHAT SERVICES
             // -------------------------------------------------------
             services.AddSignalR();
-
-            // ⚠️ doivent être scoped car ils utilisent IUserService
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChatContactService, ChatContactService>();
 
@@ -101,6 +98,11 @@ namespace SmartQuiz
             // 7️⃣ HTTP CONTEXT ACCESSOR
             // -------------------------------------------------------
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            // -------------------------------------------------------
+            // 8️⃣ DATABASE INITIALIZER (IMPORTANT)
+            // -------------------------------------------------------
+            services.AddScoped<DatabaseInitializer>();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer dbInit)
@@ -113,8 +115,8 @@ namespace SmartQuiz
                 app.UseHsts();
             }
 
-            // Seed admin
-            Task.Run(async () => await dbInit.SeedAdminUser());
+            // Seed initial admin user (synchronisé)
+            dbInit.SeedAdminUser().Wait();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

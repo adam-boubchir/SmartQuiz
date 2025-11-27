@@ -1,0 +1,65 @@
+﻿@model SmartQuiz.Models.AddGroupViewModel
+@{
+    ViewData["Title"] = "Ajouter un Groupe";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Ajouter un Groupe</h2>
+
+<form asp-action="AddGroup" method="post">
+    <div class="mb-3">
+        <label class="form-label">Nom du groupe</label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Filière</label>
+        <input asp-for="Filiere" class="form-control" />
+        <span asp-validation-for="Filiere" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Année</label>
+        <input asp-for="Annee" class="form-control" type="number" min="1" />
+        <small class="form-text text-muted">
+            @(Model.Annee == 1 ? "1ère année" : Model.Annee + "ème année")
+        </small>
+        <span asp-validation-for="Annee" class="text-danger"></span>
+    </div>
+
+
+    <div class="mb-3">
+        <label class="form-label">Professeur</label>
+        <select asp-for="TeacherId" class="form-select">
+            <option value="">-- Sélectionner un professeur --</option>
+            @foreach (var t in Model.Teachers)
+            {
+                <option value="@t.Id">@t.Username</option>
+            }
+        </select>
+        <span asp-validation-for="TeacherId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Matière</label>
+        <input asp-for="Subject" class="form-control" />
+        <span asp-validation-for="Subject" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Étudiants</label>
+        <select asp-for="StudentIds" class="form-select" multiple>
+            @foreach (var s in Model.Students)
+            {
+                <option value="@s.Id">@s.Username</option>
+            }
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-success">Ajouter le groupe</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

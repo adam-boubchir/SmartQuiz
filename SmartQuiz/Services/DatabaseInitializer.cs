@@ -15,25 +15,35 @@ namespace SmartQuiz.Services
 
         public async Task SeedAdminUser()
         {
-            // Vérifier si l'admin existe déjà
-            var existingAdmin = await _userService.GetByEmail("admin@gmail.com");
-
-            if (existingAdmin != null)
-                return;
-
-            // Créer l'Admin par défaut
-            var admin = new User
+            try
             {
-                Email = "admin@gmail.com",
-                Username = "admin",
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                Role = "Admin",
-                IsApproved = true
-            };
+                // Vérifier si l'admin existe déjà
+                var existingAdmin = await _userService.GetByEmail("admin@gmail.com");
 
-            await _userService.CreateUser(admin);
+                if (existingAdmin != null)
+                {
+                    Console.WriteLine("✔ Admin déjà existant.");
+                    return;
+                }
 
-            Console.WriteLine("✔ Admin auto-créé : admin@gmail.com / admin123");
+                // Créer l'Admin par défaut
+                var admin = new User
+                {
+                    Email = "admin@gmail.com",
+                    Username = "admin",
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                    Role = "Admin",
+                    IsApproved = true
+                };
+
+                await _userService.CreateUser(admin);
+
+                Console.WriteLine("✔ Admin créé automatiquement : admin@gmail.com / admin123");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("❌ Erreur dans DatabaseInitializer.SeedAdminUser : " + ex.Message);
+            }
         }
     }
 }
