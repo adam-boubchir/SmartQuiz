@@ -31,10 +31,22 @@ namespace SmartQuiz.Services
         }
 
         public async Task<List<Group>> GetByTeacherAsync(string teacherId)
-        {
-            var filter = Builders<Group>.Filter.Eq(g => g.TeacherId, teacherId);
-            return await _collection.Find(filter).ToListAsync();
-        }
+{
+    FilterDefinition<Group> filter;
+
+    if (string.IsNullOrEmpty(teacherId))
+    {
+        // Tous les groupes si teacherId est vide ou null
+        filter = Builders<Group>.Filter.Empty;
+    }
+    else
+    {
+        filter = Builders<Group>.Filter.Eq(g => g.TeacherId, teacherId);
+    }
+
+    return await _collection.Find(filter).ToListAsync();
+}
+
 
         public async Task<Group> GetByIdAsync(string id)
         {
@@ -55,5 +67,11 @@ namespace SmartQuiz.Services
         {
             await _collection.DeleteOneAsync(g => g.Id == id);
         }
+
+        public async Task<List<Group>> GetAllAsync()
+    {
+    return await _collection.Find(_ => true).ToListAsync();
+    }
+
     }
 }
