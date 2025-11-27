@@ -1,12 +1,14 @@
 ﻿using SmartQuiz.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace SmartQuiz.Services
 {
     public class DatabaseInitializer
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public DatabaseInitializer(UserService userService)
+        public DatabaseInitializer(IUserService userService)
         {
             _userService = userService;
         }
@@ -14,21 +16,22 @@ namespace SmartQuiz.Services
         public async Task SeedAdminUser()
         {
             // Vérifier si l'admin existe déjà
-            var admin = await _userService.GetByEmail("admin@gmail.com");
+            var existingAdmin = await _userService.GetByEmail("admin@gmail.com");
 
-            if (admin != null)
+            if (existingAdmin != null)
                 return;
 
             // Créer l'Admin par défaut
-            var newAdmin = new User
+            var admin = new User
             {
                 Email = "admin@gmail.com",
                 Username = "admin",
-                PasswordHash = "admin123",  // sera hashé automatiquement
-                Role = "Admin"
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+                Role = "Admin",
+                IsApproved = true
             };
 
-            await _userService.CreateUser(newAdmin);
+            await _userService.CreateUser(admin);
 
             Console.WriteLine("✔ Admin auto-créé : admin@gmail.com / admin123");
         }

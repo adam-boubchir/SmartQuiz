@@ -13,12 +13,13 @@ namespace SmartQuiz.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public AccountController(UserService userService)
+        public AccountController(IUserService userService)
         {
             _userService = userService;
         }
+
 
         // GET: /Account/Login
         public IActionResult Login()

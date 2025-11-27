@@ -1,0 +1,63 @@
+﻿@model SmartQuiz.Models.TeacherResultsViewModel
+@{
+    ViewData["Title"] = "Mes Résultats";
+    Layout = "~/Views/Teacher/_Layout.cshtml";
+}
+
+<div class="container-fluid fade-up">
+    <h3 class="fw-bold mb-4">Résultats des étudiants</h3>
+
+    <div class="card p-4 shadow-sm mb-4">
+        <h5 class="fw-bold mb-3">Statistiques globales</h5>
+
+        <div class="row text-center">
+            <div class="col-md-4">
+                <small class="text-muted">Étudiants évalués</small>
+                <div class="h4">@Model.TotalStudents</div>
+            </div>
+            <div class="col-md-4">
+                <small class="text-muted">Quizzes créés</small>
+                <div class="h4">@Model.TotalQuizzes</div>
+            </div>
+            <div class="col-md-4">
+                <small class="text-muted">Moyenne générale</small>
+                <div class="h4">@Model.AverageScore %</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        <h5 class="fw-bold mb-3">Détails des résultats</h5>
+
+        <table class="table table-bordered align-middle">
+            <thead>
+                <tr>
+                    <th>Étudiant</th>
+                    <th>Quiz</th>
+                    <th>Note</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Results != null && Model.Results.Any())
+                {
+                    foreach (var r in Model.Results)
+                    {
+                        <tr>
+                            <td>@r.StudentName</td>
+                            <td>@r.QuizTitle</td>
+                            <td><span class="fw-bold text-primary">@r.Score %</span></td>
+                            <td>@r.DateTaken.ToShortDateString()</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">Aucun résultat pour le moment.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

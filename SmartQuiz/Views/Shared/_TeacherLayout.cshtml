@@ -76,7 +76,13 @@
             <a class="d-flex align-items-center @((ViewContext.RouteData.Values["action"]?.ToString() == "Tps" ? "active" : ""))" href="/Teacher/Tps"><i class="fa fa-file-lines me-3"></i><span class="nav-label">Mes TPs</span></a>
             <a class="d-flex align-items-center @((ViewContext.RouteData.Values["action"]?.ToString() == "Groups" ? "active" : ""))" href="/Teacher/Groups"><i class="fa fa-users me-3"></i><span class="nav-label">Groupes</span></a>
             <a class="d-flex align-items-center" href="/Teacher/Results"><i class="fa fa-chart-line me-3"></i><span class="nav-label">Résultats</span></a>
-            <a class="d-flex align-items-center" href="/Teacher/Messages"><i class="fa fa-envelope me-3"></i><span class="nav-label">Messages</span></a>
+            <li class="nav-item">
+                <a class="nav-link" href="/Messages">
+                    <i class="fa fa-comments"></i> Messages
+                    <span id="unreadBadge" class="badge bg-danger" style="display:none;">0</span>
+                </a>
+            </li>
+
 
             <hr style="border-color: rgba(255,255,255,0.06);" />
             <a class="d-flex align-items-center" href="/Account/Profile"><i class="fa fa-user me-3"></i><span class="nav-label">Profil</span></a>

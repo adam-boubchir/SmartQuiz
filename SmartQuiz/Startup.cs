@@ -1,15 +1,16 @@
 ﻿using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MongoDB.Driver;
+using SmartQuiz.Hubs;
 using SmartQuiz.Services;
 using System;
 using System.Threading.Tasks;
 using YourProject.Services;
-using Microsoft.AspNetCore.Http;  // <-- IMPORTANT
 
 namespace SmartQuiz
 {
@@ -27,7 +28,7 @@ namespace SmartQuiz
             services.AddControllersWithViews();
 
             // -------------------------------------------------------
-            // 1️⃣  MONGO DB CONFIG
+            // 1️⃣  MONGO DB
             // -------------------------------------------------------
             services.AddSingleton<IMongoClient>(sp =>
                 new MongoClient(Configuration["MongoDB:ConnectionString"])
@@ -40,26 +41,32 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 2️⃣  SERVICES
+            // 2️⃣  CORE SERVICES
             // -------------------------------------------------------
-            services.AddSingleton<UserService>();
-            services.AddSingleton<DatabaseInitializer>();
             services.AddSingleton<MongoDbService>();
-          
 
-     
+            // IMPORTANT : DatabaseInitializer doit être Scoped
+            services.AddScoped<DatabaseInitializer>();
+
+            services.AddScoped<IUserService, UserService>();
             services.AddScoped<IQuizService, QuizService>();
             services.AddScoped<ITpService, TpService>();
             services.AddScoped<IGroupService, GroupService>();
-
-            // ⭐ IMPORTANT
-            services.AddScoped<IStudentAnswerService, StudentAnswerService>();
-            services.AddScoped<IUserService, UserService>();
             services.AddScoped<ITeacherService, TeacherService>();
             services.AddScoped<IStudentProfileService, StudentProfileService>();
+            services.AddScoped<IStudentAnswerService, StudentAnswerService>();
 
             // -------------------------------------------------------
-            // 3️⃣  SESSION
+            // 3️⃣ CHAT SERVICES
+            // -------------------------------------------------------
+            services.AddSignalR();
+
+            // ⚠️ doivent être scoped car ils utilisent IUserService
+            services.AddScoped<IMessageService, MessageService>();
+            services.AddScoped<IChatContactService, ChatContactService>();
+
+            // -------------------------------------------------------
+            // 4️⃣ SESSION
             // -------------------------------------------------------
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
@@ -70,7 +77,7 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 4️⃣ AUTH COOKIE
+            // 5️⃣ COOKIES AUTH
             // -------------------------------------------------------
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -83,24 +90,19 @@ namespace SmartQuiz
                 });
 
             // -------------------------------------------------------
-            // 5️⃣ ROLES
+            // 6️⃣ ROLES
             // -------------------------------------------------------
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("TeacherOnly", policy => policy.RequireRole("Teacher"));
-                options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
-                options.AddPolicy("StudentOnly", policy => policy.RequireRole("Student"));
+                options.AddPolicy("TeacherOnly", p => p.RequireRole("Teacher"));
+                options.AddPolicy("AdminOnly", p => p.RequireRole("Admin"));
+                options.AddPolicy("StudentOnly", p => p.RequireRole("Student"));
             });
 
             // -------------------------------------------------------
-            // 6️⃣ 🔥 IHttpContextAccessor (obligatoire pour @inject)
+            // 7️⃣ HTTP CONTEXT ACCESSOR
             // -------------------------------------------------------
-            services.AddHttpContextAccessor();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            services.AddSingleton<IMongoClient>(sp =>
-    new MongoClient(Configuration["MongoDB:ConnectionString"])
-);
-
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, DatabaseInitializer dbInit)
@@ -113,10 +115,12 @@ namespace SmartQuiz
                 app.UseHsts();
             }
 
+            // Seed admin
             Task.Run(async () => await dbInit.SeedAdminUser());
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseSession();
@@ -125,6 +129,8 @@ namespace SmartQuiz
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<ChatHub>("/chatHub");
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
