@@ -78,6 +78,10 @@
                 <i class="fa fa-book me-3"></i><span class="nav-label">Modules</span>
             </a>
 
+            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "AllGroups" ? "active" : "")" href="/Admin/AllGroups">
+                <i class="fa fa-book me-3"></i><span class="nav-label">Groups</span>
+            </a>
+
             <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")" href="/Admin/Settings">
                 <i class="fa fa-gear me-3"></i><span class="nav-label">Paramètres</span>
             </a>

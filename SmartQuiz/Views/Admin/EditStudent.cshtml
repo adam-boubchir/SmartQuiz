@@ -1,0 +1,38 @@
+@model SmartQuiz.Models.EditStudentViewModel;
+
+@{
+    ViewData["Title"] = "Modifier un étudiant";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="fade-up mb-4">
+    <h2 class="fw-bold">Modifier un étudiant</h2>
+</div>
+
+<div class="card p-3">
+    <form asp-action="EditStudent" method="post">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="mb-3">
+            <label asp-for="FullName" class="form-label"></label>
+            <input asp-for="FullName" class="form-control" />
+            <span asp-validation-for="FullName" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SelectedGroupId" class="form-label">Groupe</label>
+            <select asp-for="SelectedGroupId" class="form-select" asp-items="@(new SelectList(Model.Groups, "Id", "Name"))">
+                <option value="">-- Aucun groupe --</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Enregistrer</button>
+        <a asp-action="Students" class="btn btn-secondary">Annuler</a>
+    </form>
+</div>

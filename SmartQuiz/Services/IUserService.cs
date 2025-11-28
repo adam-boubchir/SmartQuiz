@@ -14,6 +14,7 @@ namespace SmartQuiz.Services
         Task ActivateUser(string id);
         Task<List<User>> GetPendingUsers();
         Task<bool> UpdateBasicInfoAsync(string userId, string username, string email);
+        
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
         Task UpdateProfileImageAsync(string userId, string imageUrl);

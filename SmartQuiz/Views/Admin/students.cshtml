@@ -1,0 +1,100 @@
+@model SmartQuiz.Models.AdminStudentsViewModel
+
+@{
+    ViewData["Title"] = "Étudiants";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="fade-up mb-4">
+    <h2 class="fw-bold">Gestion des Étudiants</h2>
+    <p class="text-muted">Filtre par filière et année scolaire, visualise et gère les étudiants</p>
+</div>
+
+<div class="mb-3 d-flex justify-content-end gap-2">
+    <a asp-action="AddStudent" asp-controller="Admin" class="btn btn-success">
+        ➕ Ajouter un étudiant
+    </a>
+    <button class="btn btn-primary" type="submit" form="filterForm">
+        🔍 Appliquer les filtres
+    </button>
+</div>
+
+<!-- 🔍 FILTRES -->
+<div class="card p-3 mb-4">
+    <form id="filterForm" asp-action="Students" asp-controller="Admin" method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label">Filière</label>
+            <select name="filiere" class="form-select">
+                <option value="">-- Toutes les filières --</option>
+                @foreach (var f in Model.Filieres)
+                {
+                    <option value="@f" selected="@(Model.SelectedFiliere == f ? "selected" : null)">
+                        @f
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Année scolaire</label>
+            <select name="annee" class="form-select">
+                <option value="">-- Toutes les années --</option>
+                @foreach (var a in Model.Annees)
+                {
+                    <option value="@a" selected="@(Model.SelectedAnnee == a ? "selected" : null)">
+                        @a
+                    </option>
+                }
+            </select>
+        </div>
+    </form>
+</div>
+
+<!-- 📋 LISTE DES ÉTUDIANTS -->
+<div class="card p-3 fade-up">
+    <h5 class="mb-3">Liste des étudiants</h5>
+
+    @if (Model.Students == null || !Model.Students.Any())
+    {
+        <p class="text-muted">Aucun étudiant trouvé pour ces critères.</p>
+    }
+    else
+    {
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Nom complet</th>
+                    <th>Email</th>
+                    <th>Filière</th>
+                    <th>Année</th>
+                    <th>Groupe</th>
+                    <th style="width:160px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Students)
+                {
+                    <tr>
+                        <td>@s.FullName</td>
+                        <td>@s.Email</td>
+                        <td>@s.Filiere</td>
+                        <td>@s.Annee</td>
+                        <td>@s.GroupName</td>
+                        <td>
+                            <a asp-action="StudentDetails" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">
+                                Détails
+                            </a>
+                            <a asp-action="EditStudent" asp-route-id="@s.Id" class="btn btn-sm btn-primary">
+                                Modifier
+                            </a>
+                            <a asp-action="DeleteStudent" asp-route-id="@s.Id" class="btn btn-sm btn-danger" 
+                               onclick="return confirm('Voulez-vous vraiment supprimer cet étudiant ?');">
+                                Supprimer
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>

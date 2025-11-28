@@ -1,0 +1,34 @@
+@model SmartQuiz.Models.StudentInfoViewModel
+
+@{
+    ViewData["Title"] = "Détails de l'étudiant";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div class="fade-up mb-4">
+    <h2 class="fw-bold">Détails de l'étudiant</h2>
+</div>
+
+<div class="card p-3">
+    <dl class="row">
+        <dt class="col-sm-3">Nom complet</dt>
+        <dd class="col-sm-9">@Model.FullName</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        <dt class="col-sm-3">Filière</dt>
+        <dd class="col-sm-9">@Model.Filiere</dd>
+
+        <dt class="col-sm-3">Année</dt>
+        <dd class="col-sm-9">@Model.Annee</dd>
+
+        <dt class="col-sm-3">Groupe</dt>
+        <dd class="col-sm-9">@Model.GroupName</dd>
+    </dl>
+
+    <a asp-action="EditStudent" asp-route-id="@Model.Id" class="btn btn-primary">
+        Modifier
+    </a>
+    <a asp-action="Students" class="btn btn-secondary">Retour à la liste</a>
+</div>

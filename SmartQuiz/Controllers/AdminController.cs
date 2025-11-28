@@ -124,47 +124,183 @@ namespace SmartQuiz.Controllers
 
 
         // 🎯 PAGE Students avec statistiques avancées
-        public async Task<IActionResult> Students()
+         public async Task<IActionResult> Students(string? filiere, int? annee)
+{
+    // 1️⃣ Récupérer tous les utilisateurs
+    var allUsers = await _userService.GetAllUsers();
+
+    // 2️⃣ Filtrer uniquement les étudiants
+    var students = allUsers.Where(u => u.Role == "Student").ToList();
+
+    // 3️⃣ Récupérer tous les groupes
+    var allGroups = await _groupService.GetAllAsync();
+
+    // 4️⃣ Construire les listes pour les filtres (sans doublons)
+    var filieres = allGroups
+        .Where(g => !string.IsNullOrEmpty(g.Filiere))
+        .Select(g => g.Filiere)
+        .Distinct()
+        .OrderBy(f => f)
+        .ToList();
+
+    var annees = allGroups
+        .Select(g => g.Annee)
+        .Distinct()
+        .OrderBy(a => a)
+        .ToList();
+
+    // 5️⃣ Appliquer les filtres sur les étudiants selon leur groupe
+    if (!string.IsNullOrEmpty(filiere) || annee.HasValue)
+    {
+        var filteredGroups = allGroups.AsEnumerable();
+
+        if (!string.IsNullOrEmpty(filiere))
+            filteredGroups = filteredGroups.Where(g => g.Filiere == filiere);
+
+        if (annee.HasValue)
+            filteredGroups = filteredGroups.Where(g => g.Annee == annee.Value);
+
+        var groupIds = filteredGroups.Select(g => g.Id).ToHashSet();
+        students = students.Where(s => !string.IsNullOrEmpty(s.GroupId) && groupIds.Contains(s.GroupId)).ToList();
+    }
+
+    // 6️⃣ Statistiques
+    int totalGroups = allGroups.Count;
+    int studentsWithoutGroup = students.Count(s => string.IsNullOrEmpty(s.GroupId));
+    int average = totalGroups == 0 ? 0 : students.Count / totalGroups;
+
+    // 7️⃣ Créer un dictionnaire pour lookup rapide des groupes
+    var groupDict = allGroups.ToDictionary(g => g.Id, g => g);
+
+    // 8️⃣ Préparer le modèle pour la vue
+    var model = new AdminStudentsViewModel
+    {
+        SelectedFiliere = filiere,
+        SelectedAnnee = annee,
+        Filieres = filieres,
+        Annees = annees,
+        TotalStudents = students.Count,
+        TotalGroups = totalGroups,
+        StudentsWithoutGroup = studentsWithoutGroup,
+        AverageStudentsPerGroup = average,
+        Students = students.Select(s =>
         {
-            // 1️⃣ Récupérer tous les utilisateurs
-            var allUsers = await _userService.GetAllUsers();
+            groupDict.TryGetValue(s.GroupId ?? "", out var group);
 
-            // 2️⃣ Filtrer uniquement les étudiants
-            var students = allUsers.Where(u => u.Role == "Student").ToList();
-
-            // 3️⃣ Récupérer tous les groupes
-            var allGroups = await _groupService.GetAllAsync();
-
-            // 4️⃣ Statistiques
-            int totalGroups = allGroups.Count;
-            int studentsWithoutGroup = students.Count(s => string.IsNullOrEmpty(s.GroupId));
-            int average = totalGroups == 0 ? 0 : students.Count / totalGroups;
-
-            // 5️⃣ Préparer le modèle pour la vue
-            var model = new AdminStudentsViewModel
+            return new StudentInfoViewModel
             {
-                TotalStudents = students.Count,
-                TotalGroups = totalGroups,
-                StudentsWithoutGroup = studentsWithoutGroup,
-                AverageStudentsPerGroup = average,
-                Students = students.Select(s => new StudentInfoViewModel
-                {
-                    Id = s.Id.ToString(),
-                    FullName = s.Username,
-                    Email = s.Email,
-                    GroupName = string.IsNullOrEmpty(s.GroupId)
-                        ? "Non attribué"
-                        : allGroups.FirstOrDefault(g => g.Id == s.GroupId)?.Name ?? "Non attribué"
-                }).ToList(),
-                Groups = allGroups.Select(g => new GroupViewModel
-                {
-                    Id = g.Id,
-                    Name = g.Name
-                }).ToList()
+                Id = s.Id.ToString(),
+                FullName = s.Username,
+                Email = s.Email,
+                Filiere = group?.Filiere ?? "-",
+                Annee = group?.Annee ?? 0,
+                GroupName = group?.Name ?? "Non attribué"
             };
+        }).ToList(),
+        Groups = allGroups.Select(g => new GroupViewModel
+        {
+            Id = g.Id,
+            Name = g.Name
+        }).ToList()
+    };
 
-            return View(model);
-        }
+    return View(model);
+}
+
+
+         // GET : Détails d'un étudiant
+public async Task<IActionResult> StudentDetails(string id)
+{
+    if (string.IsNullOrEmpty(id))
+        return NotFound();
+
+    var student = await _userService.GetByIdAsync(id);
+    if (student == null || student.Role != "Student")
+        return NotFound();
+
+    var group = string.IsNullOrEmpty(student.GroupId) 
+        ? null 
+        : await _groupService.GetByIdAsync(student.GroupId);
+
+    var model = new StudentInfoViewModel
+    {
+        Id = student.Id.ToString(),
+        FullName = student.Username,
+        Email = student.Email,
+        GroupName = group?.Name ?? "Non attribué",
+        Filiere = group?.Filiere ?? "-",
+        Annee = group?.Annee ?? 0
+    };
+
+    return View(model);
+}
+
+// GET : Modifier un étudiant
+[HttpGet]
+public async Task<IActionResult> EditStudent(string id)
+{
+    if (string.IsNullOrEmpty(id))
+        return NotFound();
+
+    var student = await _userService.GetByIdAsync(id);
+
+    if (student == null || student.Role != "Student")
+        return NotFound();
+
+    var allGroups = await _groupService.GetAllAsync();
+
+    var model = new EditStudentViewModel
+    {
+        Id = student.Id.ToString(),
+        FullName = student.Username,
+        Email = student.Email,
+        SelectedGroupId = student.GroupId,
+        Groups = allGroups.Select(g => new GroupViewModel
+        {
+            Id = g.Id,
+            Name = g.Name
+        }).ToList()
+    };
+
+    return View(model);
+}
+
+// POST : Modifier un étudiant
+[HttpPost]
+[HttpPost]
+public async Task<IActionResult> EditStudent(EditStudentViewModel model)
+{
+    if (!ModelState.IsValid)
+        return View(model);
+
+    var user = await _userService.GetByIdAsync(model.Id);
+    if (user == null) return NotFound();
+
+    user.Username = model.FullName;
+    user.Email = model.Email;
+    user.GroupId = model.SelectedGroupId;
+
+    await _userService.UpdateAsync(user);
+
+    return RedirectToAction("Students");
+}
+
+
+// GET : Supprimer un étudiant
+public async Task<IActionResult> DeleteStudent(string id)
+{
+    if (string.IsNullOrEmpty(id))
+        return NotFound();
+
+   var student = await _userService.GetByIdAsync(id);
+
+    if (student == null || student.Role != "Student")
+        return NotFound();
+
+    await _userService.DeleteUser(id);
+
+    return RedirectToAction("Students");
+}
 
         // ✅ PAGE USERS (tous les utilisateurs, sécurisée)
         public async Task<IActionResult> Users()
