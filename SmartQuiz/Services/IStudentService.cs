@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using SmartQuiz.Models;
 
-namespace SmartQuuiz.Services
+namespace SmartQuiz.Services
 {
     public interface IStudentService
     {

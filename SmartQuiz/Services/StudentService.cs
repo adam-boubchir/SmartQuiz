@@ -1,6 +1,6 @@
 ﻿using MongoDB.Driver;
 using SmartQuiz.Models;
-using SmartQuuiz.Services;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

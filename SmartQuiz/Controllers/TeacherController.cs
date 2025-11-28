@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SmartQuiz.Models;     // FIX
+using SmartQuiz.Services;   // FIX
+using System.Security.Claims;
 using System.Threading.Tasks;
 using YourProject.Services;
-using YourProject.Models;
-using System.Security.Claims;
 
-
-namespace SmartQuiz.Controllers
+namespace SmartQuiz.Controllers   // FIX
 {
     [Authorize(Roles = "Teacher")]
     public class TeacherController : Controller
@@ -22,14 +22,12 @@ namespace SmartQuiz.Controllers
             _groupService = groupService;
         }
 
-        // Dashboard
         public async Task<IActionResult> Index()
         {
             var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             if (string.IsNullOrEmpty(teacherId))
-            {
                 return RedirectToAction("Login", "Account");
-            }
 
             ViewBag.TotalQuizzes = await _quizService.CountByTeacherAsync(teacherId);
             ViewBag.TotalTps = await _tpService.CountByTeacherAsync(teacherId);
@@ -42,7 +40,6 @@ namespace SmartQuiz.Controllers
             return View();
         }
 
-        // GET: /Teacher/Quizzes
         public async Task<IActionResult> Quizzes()
         {
             var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -50,7 +47,6 @@ namespace SmartQuiz.Controllers
             return View(quizzes);
         }
 
-        // GET: /Teacher/Tps
         public async Task<IActionResult> Tps()
         {
             var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -58,14 +54,11 @@ namespace SmartQuiz.Controllers
             return View(tps);
         }
 
-        // GET: /Teacher/Groups
         public async Task<IActionResult> Groups()
         {
             var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             var groups = await _groupService.GetByTeacherAsync(teacherId);
             return View(groups);
         }
-
-        // Additional endpoints (Create/Edit/Delete) can be added below...
     }
 }

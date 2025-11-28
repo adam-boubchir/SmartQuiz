@@ -9,7 +9,6 @@ using MongoDB.Driver;
 using SmartQuiz.Hubs;
 using SmartQuiz.Services;
 using System;
-using System.Threading.Tasks;
 using YourProject.Services;
 
 namespace SmartQuiz
@@ -52,6 +51,9 @@ namespace SmartQuiz
             services.AddScoped<ITeacherService, TeacherService>();
             services.AddScoped<IStudentProfileService, StudentProfileService>();
             services.AddScoped<IStudentAnswerService, StudentAnswerService>();
+
+            // 👉 AJOUT MANQUANT (FIX DE TON ERREUR)
+            services.AddScoped<IStudentService, StudentService>();
 
             // -------------------------------------------------------
             // 3️⃣ CHAT SERVICES

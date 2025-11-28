@@ -1,12 +1,10 @@
 ﻿using MongoDB.Driver;
-using SmartQuiz.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using YourProject.Services;
-using YourProject.Models;
+using SmartQuiz.Models;   // FIX
 
-namespace SmartQuiz.Services
+namespace SmartQuiz.Services   // FIX
 {
     public class GroupService : IGroupService
     {
@@ -15,6 +13,11 @@ namespace SmartQuiz.Services
         public GroupService(MongoDbService mongo)
         {
             _collection = mongo.GetCollection<Group>("Groups");
+        }
+
+        public async Task<List<Group>> GetAllAsync()
+        {
+            return await _collection.Find(_ => true).ToListAsync();
         }
 
         public async Task<long> CountByTeacherAsync(string teacherId)
