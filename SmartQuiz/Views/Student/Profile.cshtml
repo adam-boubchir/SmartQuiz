@@ -3,7 +3,20 @@
     ViewData["Title"] = "Profil étudiant";
     Layout = "~/Views/Student/_Layout.cshtml";
 }
+<!-- 🔥 MESSAGES TEMP DATA 🔥 -->
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger text-center">
+        @TempData["ErrorMessage"]
+    </div>
+}
 
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success text-center">
+        @TempData["SuccessMessage"]
+    </div>
+}
 <div class="container-fluid fade-up">
     <div class="row">
         <div class="col-12 mb-3">
@@ -109,6 +122,8 @@
                         {
                             <tr><td colspan="2" class="text-center text-muted">Aucun professeur assigné.</td></tr>
                         }
+                       
+
                     </tbody>
                 </table>
             </div>

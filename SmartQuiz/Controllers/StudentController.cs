@@ -17,7 +17,7 @@ namespace SmartQuiz.Controllers
         private readonly IUserService _userService;
         private readonly ITeacherService _teacherService;
         private readonly IStudentProfileService _studentProfileService;
-
+      
         public StudentController(
             IQuizService quizService,
             ITpService tpService,
