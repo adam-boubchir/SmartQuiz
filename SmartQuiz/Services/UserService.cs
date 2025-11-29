@@ -8,6 +8,8 @@ namespace SmartQuiz.Services
     public class UserService : IUserService
     {
         private readonly IMongoCollection<User> _users;
+        private readonly IMongoCollection<Student> _students;
+
 
         public UserService(IConfiguration config)
         {
@@ -27,9 +29,10 @@ namespace SmartQuiz.Services
 
         public async Task<User> GetByIdAsync(string id)
         {
-            var objectId = ObjectId.Parse(id);
-            return await _users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
+           var objectId = ObjectId.Parse(id);
+           return await _users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
         }
+
 
         public async Task<User> GetByEmail(string email)
         {
@@ -111,5 +114,47 @@ namespace SmartQuiz.Services
 
         public bool CheckPassword(string enteredPassword, string storedHash) =>
             BCrypt.Net.BCrypt.Verify(enteredPassword, storedHash);
+
+
+         public async Task UpdateStudentBasicInfoAsync(string id, string fullName, string email, string groupId)
+        {
+         // Convertir string id en ObjectId
+         var objectId = ObjectId.Parse(id);
+
+         // Créer le filtre
+         var filter = Builders<User>.Filter.Eq(u => u.Id, objectId);
+
+         // Créer la mise à jour
+         var update = Builders<User>.Update
+         .Set(u => u.Username, fullName)
+         .Set(u => u.Email, email)
+         .Set(u => u.GroupId, groupId);
+
+         // Appliquer l'update
+         await _users.UpdateOneAsync(filter, update);
+        } 
+
+
+        public async Task UpdateTeacherBasicInfoAsync(string id, string username, string email, List<string> groupIds, List<string> subjectIds, int assignedHours)
+{
+    var objectId = ObjectId.Parse(id);
+
+    var update = Builders<User>.Update
+        .Set(u => u.Username, username)
+        .Set(u => u.Email, email)
+        .Set(u => u.GroupIds, groupIds)
+        .Set(u => u.SubjectIds, subjectIds)
+        .Set(u => u.AssignedHours, assignedHours);  // nouveau champ
+
+    var filter = Builders<User>.Filter.Eq(u => u.Id, objectId);
+    await _users.UpdateOneAsync(filter, update);
+}
+
+
+
+
+
+
+
     }
 }

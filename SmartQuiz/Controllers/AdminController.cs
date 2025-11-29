@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartQuiz.Models;
 using SmartQuiz.Services;
+using System.Text;
+
 
 using System.Linq;
 using System.Threading.Tasks;
@@ -123,6 +125,69 @@ namespace SmartQuiz.Controllers
         }
 
 
+         
+         public async Task<IActionResult> ExportStudents(string? filiere, int? annee)
+{
+    // 1️⃣ Récupérer tous les utilisateurs
+    var allUsers = await _userService.GetAllUsers();
+
+    // 2️⃣ Filtrer uniquement les étudiants
+    var students = allUsers.Where(u => u.Role == "Student").ToList();
+
+    // 3️⃣ Récupérer tous les groupes
+    var allGroups = await _groupService.GetAllAsync();
+    var groupDict = allGroups.ToDictionary(g => g.Id, g => g);
+
+    // 4️⃣ Appliquer les filtres filière / année (via le groupe)
+    if (!string.IsNullOrEmpty(filiere) || annee.HasValue)
+    {
+        students = students.Where(s =>
+        {
+            if (string.IsNullOrEmpty(s.GroupId)) return false;
+            if (!groupDict.TryGetValue(s.GroupId, out var g)) return false;
+
+            bool ok = true;
+            if (!string.IsNullOrEmpty(filiere))
+                ok = ok && g.Filiere == filiere;
+            if (annee.HasValue)
+                ok = ok && g.Annee == annee.Value;
+
+            return ok;
+        }).ToList();
+    }
+
+    // 5️⃣ Construire le CSV
+    var sb = new StringBuilder();
+    sb.AppendLine("Nom complet;Email;Filiere;Annee;Groupe");
+
+    foreach (var s in students)
+    {
+        groupDict.TryGetValue(s.GroupId ?? "", out var g);
+
+        var fullName = s.Username?.Replace(";", ",") ?? "";
+        var email = s.Email?.Replace(";", ",") ?? "";
+        var fil = g?.Filiere?.Replace(";", ",") ?? "-";
+        var an = g?.Annee.ToString() ?? "";
+        var gName = g?.Name?.Replace(";", ",") ?? "Non attribué";
+
+        sb.AppendLine($"{fullName};{email};{fil};{an};{gName}");
+    }
+
+    var bytes = Encoding.UTF8.GetBytes(sb.ToString());
+    var fileName = "etudiants";
+
+    if (!string.IsNullOrEmpty(filiere))
+        fileName += $"_{filiere}";
+    if (annee.HasValue)
+        fileName += $"_annee{annee.Value}";
+
+    fileName += ".csv";
+
+    return File(bytes, "text/csv", fileName);
+}
+
+
+
         // 🎯 PAGE Students avec statistiques avancées
          public async Task<IActionResult> Students(string? filiere, int? annee)
 {
@@ -208,34 +273,9 @@ namespace SmartQuiz.Controllers
 }
 
 
-         // GET : Détails d'un étudiant
-public async Task<IActionResult> StudentDetails(string id)
-{
-    if (string.IsNullOrEmpty(id))
-        return NotFound();
-
-    var student = await _userService.GetByIdAsync(id);
-    if (student == null || student.Role != "Student")
-        return NotFound();
-
-    var group = string.IsNullOrEmpty(student.GroupId) 
-        ? null 
-        : await _groupService.GetByIdAsync(student.GroupId);
-
-    var model = new StudentInfoViewModel
-    {
-        Id = student.Id.ToString(),
-        FullName = student.Username,
-        Email = student.Email,
-        GroupName = group?.Name ?? "Non attribué",
-        Filiere = group?.Filiere ?? "-",
-        Annee = group?.Annee ?? 0
-    };
-
-    return View(model);
-}
 
 // GET : Modifier un étudiant
+
 [HttpGet]
 public async Task<IActionResult> EditStudent(string id)
 {
@@ -243,23 +283,50 @@ public async Task<IActionResult> EditStudent(string id)
         return NotFound();
 
     var student = await _userService.GetByIdAsync(id);
-
     if (student == null || student.Role != "Student")
         return NotFound();
 
     var allGroups = await _groupService.GetAllAsync();
 
+    // Dropdowns distincts pour filieres et années
+    var filieres = allGroups
+        .Where(g => !string.IsNullOrEmpty(g.Filiere))
+        .Select(g => g.Filiere)
+        .Distinct()
+        .OrderBy(f => f)
+        .ToList();
+
+    var annees = allGroups
+        .Select(g => g.Annee)
+        .Distinct()
+        .OrderBy(a => a)
+        .ToList();
+
+    // Récupérer le groupe de l'étudiant
+    var studentGroup = allGroups.FirstOrDefault(g => g.Id == student.GroupId);
+
+    // Vérifier que SelectedFiliere et SelectedAnnee existent dans les listes
+    string selectedFiliere = studentGroup?.Filiere;
+    int? selectedAnnee = studentGroup?.Annee;
+
+    if (!filieres.Contains(selectedFiliere))
+        selectedFiliere = null;
+
+    if (selectedAnnee.HasValue && !annees.Contains(selectedAnnee.Value))
+        selectedAnnee = null;
+
+    // Préparer le modèle pour la vue
     var model = new EditStudentViewModel
     {
         Id = student.Id.ToString(),
         FullName = student.Username,
         Email = student.Email,
         SelectedGroupId = student.GroupId,
-        Groups = allGroups.Select(g => new GroupViewModel
-        {
-            Id = g.Id,
-            Name = g.Name
-        }).ToList()
+        Groups = allGroups,        // OK car List<Group>
+        SelectedFiliere = selectedFiliere,
+        Filieres = filieres,
+        SelectedAnnee = selectedAnnee,
+        Annees = annees
     };
 
     return View(model);
@@ -267,23 +334,60 @@ public async Task<IActionResult> EditStudent(string id)
 
 // POST : Modifier un étudiant
 [HttpPost]
-[HttpPost]
 public async Task<IActionResult> EditStudent(EditStudentViewModel model)
 {
     if (!ModelState.IsValid)
+    {
+        // Recharger les listes pour le formulaire si validation échoue
+        var allGroups = await _groupService.GetAllAsync();
+
+        model.Groups = allGroups;
+
+        model.Filieres = allGroups
+            .Where(g => !string.IsNullOrEmpty(g.Filiere))
+            .Select(g => g.Filiere)
+            .Distinct()
+            .OrderBy(f => f)
+            .ToList();
+
+        model.Annees = allGroups
+            .Select(g => g.Annee)
+            .Distinct()
+            .OrderBy(a => a)
+            .ToList();
+
         return View(model);
+    }
 
-    var user = await _userService.GetByIdAsync(model.Id);
-    if (user == null) return NotFound();
+    // Récupérer l'étudiant depuis la base
+    var student = await _userService.GetByIdAsync(model.Id);
+    if (student == null || student.Role != "Student")
+        return NotFound();
 
-    user.Username = model.FullName;
-    user.Email = model.Email;
-    user.GroupId = model.SelectedGroupId;
+    // Mettre à jour les propriétés
+    student.Username = model.FullName;
+    student.Email = model.Email;
+    student.GroupId = model.SelectedGroupId;
 
-    await _userService.UpdateAsync(user);
+    // Appeler le service pour mettre à jour MongoDB
+    await _userService.UpdateStudentBasicInfoAsync(
+        student.Id.ToString(),  // Convertir ObjectId en string si nécessaire
+        student.Username,
+        student.Email,
+        student.GroupId
+    );
 
+    // Rediriger vers la liste des étudiants
     return RedirectToAction("Students");
 }
+
+
+
+
+
+
+
+
 
 
 // GET : Supprimer un étudiant

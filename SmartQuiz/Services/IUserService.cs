@@ -22,5 +22,9 @@ namespace SmartQuiz.Services
         // password helpers
         string HashPassword(string password);
         bool CheckPassword(string enteredPassword, string storedHash);
+
+        Task UpdateStudentBasicInfoAsync(string id, string fullName, string email, string groupId);
+
+        Task UpdateTeacherBasicInfoAsync(string id, string username, string email, List<string> groupIds, List<string> subjectIds, int assignedHours);
     }
 }

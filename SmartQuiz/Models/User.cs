@@ -11,33 +11,42 @@ namespace SmartQuiz.Models
         public ObjectId Id { get; set; }
 
         [BsonElement("email")]
-        public string Email { get; set; }
+        public string Email { get; set; } = string.Empty;
 
         [BsonElement("username")]
-        public string Username { get; set; }
+        public string Username { get; set; } = string.Empty;
 
         [BsonElement("passwordHash")]
-        public string PasswordHash { get; set; }
+        public string PasswordHash { get; set; } = string.Empty;
 
         [BsonElement("role")]
-        public string Role { get; set; } // Admin, Teacher, Student
+        public string Role { get; set; } = "Student"; // Admin, Teacher, Student
 
-        // Student group
+        // Pour les étudiants
         [BsonElement("groupId")]
-        public string GroupId { get; set; }
+        public string? GroupId { get; set; }
 
-        // Multi teachers
+        // Pour les enseignants : groupes qu'ils encadrent
+        [BsonElement("groupIds")]
+        public List<string> GroupIds { get; set; } = new List<string>();
+
+        // Pour les enseignants : matières qu'ils enseignent
+        [BsonElement("subjectIds")]
+        public List<string> SubjectIds { get; set; } = new List<string>();
+
+        // Heures assignées pour un enseignant
+        [BsonElement("assignedHours")]
+        public int AssignedHours { get; set; } = 0;
+
         [BsonElement("teacherIds")]
         public List<string> TeacherIds { get; set; } = new List<string>();
 
         [BsonElement("isApproved")]
         public bool IsApproved { get; set; } = false;
 
-        // Profile image only
         [BsonElement("profileImage")]
-        public string ProfileImage { get; set; }
+        public string? ProfileImage { get; set; }
 
-        // Tracking
         [BsonElement("createdAt")]
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }

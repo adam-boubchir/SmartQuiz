@@ -17,7 +17,9 @@
             <small class="text-muted">Total Utilisateurs</small>
             <h3 class="mt-2">@Model.TotalUsers</h3>
             <div class="mt-2">
-                <span class="badge bg-primary bg-opacity-10 text-primary">Voir</span>
+                <a href="/Admin/Users" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">
+                    Voir
+                </a>
             </div>
         </div>
     </div>
@@ -28,7 +30,9 @@
             <small class="text-muted">Enseignants</small>
             <h3 class="mt-2">@Model.Teachers</h3>
             <div class="mt-2">
-                <span class="badge bg-primary bg-opacity-10 text-primary">Détails</span>
+                <a href="/Admin/Users?role=Teacher" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">
+                    Détails
+                </a>
             </div>
         </div>
     </div>
@@ -39,7 +43,9 @@
             <small class="text-muted">Étudiants</small>
             <h3 class="mt-2">@Model.Students</h3>
             <div class="mt-2">
-                <span class="badge bg-primary bg-opacity-10 text-primary">Suivi</span>
+                <a href="/Admin/Students" class="badge bg-primary bg-opacity-10 text-primary text-decoration-none">
+                    Suivi
+                </a>
             </div>
         </div>
     </div>

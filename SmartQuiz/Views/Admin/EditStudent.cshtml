@@ -32,6 +32,23 @@
             </select>
         </div>
 
+        <div class="mb-3">
+            <label asp-for="SelectedFiliere" class="form-label">Filière</label>
+            <select asp-for="SelectedFiliere" class="form-select" 
+                    asp-items="@(new SelectList(Model.Filieres, Model.SelectedFiliere ?? ""))">
+                <option value="">-- Sélectionner une filière --</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label asp-for="SelectedAnnee" class="form-label">Année</label>
+            <select asp-for="SelectedAnnee" class="form-select" 
+                    asp-items="@(new SelectList(Model.Annees, Model.SelectedAnnee ?? 0))">
+                 <option value="">-- Sélectionner une année --</option>
+            </select>
+        </div>
+
+
         <button type="submit" class="btn btn-primary">Enregistrer</button>
         <a asp-action="Students" class="btn btn-secondary">Annuler</a>
     </form>

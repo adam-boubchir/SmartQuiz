@@ -1,0 +1,71 @@
+@model SmartQuiz.Models.EditGroupViewModel
+
+<form asp-action="EditGroup" asp-controller="Groups" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">Nom du groupe</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Filiere" class="form-label">Filière</label>
+        <input asp-for="Filiere" class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Annee" class="form-label">Année</label>
+        <select asp-for="Annee" class="form-select" asp-items="@(new SelectList(Model.Annees, Model.Annee))">
+                <option value="">-- Sélectionner --</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Subject" class="form-label">Matière</label>
+        <input asp-for="Subject" class="form-control" />
+    </div>
+
+    <div class="form-check form-switch mb-3">
+        <input asp-for="IsActive" class="form-check-input" />
+        <label asp-for="IsActive" class="form-check-label">Groupe actif</label>
+    </div>
+
+    <!-- Filtrer les étudiants -->
+    <div class="card p-3 mb-3">
+        <h5>Filtrer les étudiants à ajouter</h5>
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <select asp-for="FilterFiliere" class="form-select" asp-items="@(new SelectList(Model.Filieres, Model.FilterFiliere))">
+                    <option value="">-- Toutes les filières --</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <select asp-for="FilterAnnee" class="form-select" asp-items="@(new SelectList(Model.Annees, Model.FilterAnnee))">
+                    <option value="">-- Toutes les années --</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary">🔍 Appliquer filtre</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Liste des étudiants -->
+    <div class="mb-3">
+        <label class="form-label">Sélectionner les étudiants</label>
+        <select asp-for="SelectedStudentIds" class="form-select" multiple size="10">
+            @foreach (var student in Model.Students)
+            {
+                <option value="@student.Id" selected="@Model.SelectedStudentIds.Contains(student.Id)">
+                    @student.FullName (@student.Filiere - @student.Annee)
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="d-flex justify-content-between mt-4">
+        <a asp-controller="Admin" asp-action="AllGroups" class="btn btn-secondary">⬅️ Annuler</a>
+        <button type="submit" class="btn btn-primary">💾 Enregistrer les modifications</button>
+    </div>
+</form>

@@ -96,13 +96,33 @@
                         <td>@g.Subject</td>
                         <td>@g.NombreEtudiants</td>
                         <td>
-                            <a asp-action="GroupDetails" asp-route-id="@g.Id" class="btn btn-sm btn-outline-primary">
-                                Détails
-                            </a>
-                            <a asp-action="EditGroup" asp-route-id="@g.Id" class="btn btn-sm btn-primary">
-                                Modifier
-                            </a>
-                        </td>
+    <a asp-controller="Groups"
+       asp-action="Details"
+       asp-route-id="@g.Id"
+       class="btn btn-sm btn-outline-primary">
+        Détails
+    </a>
+
+    <a asp-controller="Groups"
+       asp-action="Edit"
+       asp-route-id="@g.Id"
+       class="btn btn-sm btn-primary">
+        Modifier
+    </a>
+
+    <form asp-controller="Groups"
+          asp-action="Delete"
+          asp-route-id="@g.Id"
+          method="post"
+          class="d-inline"
+          onsubmit="return confirm('Supprimer ce groupe ?');">
+        @Html.AntiForgeryToken()
+        <button type="submit" class="btn btn-sm btn-outline-danger">
+            Supprimer
+        </button>
+    </form>
+</td>
+
                     </tr>
                 }
             </tbody>

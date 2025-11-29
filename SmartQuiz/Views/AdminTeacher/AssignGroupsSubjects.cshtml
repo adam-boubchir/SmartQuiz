@@ -1,0 +1,48 @@
+@model SmartQuiz.Models.EditTeacherViewModel
+
+<h2>Assigner Groupes et Matières</h2>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<form asp-action="AssignGroupsSubjects" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="mb-3">
+        <label class="form-label">Groupes assignés</label>
+        <select asp-for="SelectedGroupIds" class="form-select" multiple>
+           @foreach(var g in Model.Groups)
+           {
+                <option value="@g.Id" selected="@(Model.SelectedGroupIds.Contains(g.Id) ? "selected" : null)">
+                    @g.Name
+                </option>
+           }
+        </select>
+        <input asp-for="NewGroupName" class="form-control mt-2" placeholder="Ou saisir un nouveau groupe" />
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Matières assignées</label>
+        <select asp-for="SelectedSubjects" class="form-select" multiple>
+            @foreach(var s in Model.Subjects)
+            {
+                <option value="@s" selected="@(Model.SelectedSubjects.Contains(s) ? "selected" : null)">
+                    @s
+                </option>
+            }
+        </select>
+        <input asp-for="NewSubjectName" class="form-control mt-2" placeholder="Ou saisir une nouvelle matière" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="AssignedHours" class="form-label">Heures assignées</label>
+        <input asp-for="AssignedHours" type="number" class="form-control" min="0" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <a asp-action="Index" class="btn btn-secondary">Annuler</a>
+</form>

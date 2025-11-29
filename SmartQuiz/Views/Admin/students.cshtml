@@ -17,36 +17,33 @@
     <button class="btn btn-primary" type="submit" form="filterForm">
         🔍 Appliquer les filtres
     </button>
+    <a asp-action="ExportStudents"
+       asp-controller="Admin"
+       asp-route-filiere="@Model.SelectedFiliere"
+       asp-route-annee="@Model.SelectedAnnee"
+       class="btn btn-outline-secondary">
+        ⬇ Télécharger la liste
+    </a>
 </div>
 
 <!-- 🔍 FILTRES -->
 <div class="card p-3 mb-4">
     <form id="filterForm" asp-action="Students" asp-controller="Admin" method="get" class="row g-3 align-items-end">
+
         <div class="col-md-4">
-            <label class="form-label">Filière</label>
-            <select name="filiere" class="form-select">
+            <label asp-for="SelectedFiliere" class="form-label">Filière</label>
+            <select asp-for="SelectedFiliere" class="form-select" asp-items="@(new SelectList(Model.Filieres, Model.SelectedFiliere))">
                 <option value="">-- Toutes les filières --</option>
-                @foreach (var f in Model.Filieres)
-                {
-                    <option value="@f" selected="@(Model.SelectedFiliere == f ? "selected" : null)">
-                        @f
-                    </option>
-                }
             </select>
         </div>
 
         <div class="col-md-4">
-            <label class="form-label">Année scolaire</label>
-            <select name="annee" class="form-select">
+            <label asp-for="SelectedAnnee" class="form-label">Année scolaire</label>
+            <select asp-for="SelectedAnnee" class="form-select" asp-items="@(new SelectList(Model.Annees, Model.SelectedAnnee))">
                 <option value="">-- Toutes les années --</option>
-                @foreach (var a in Model.Annees)
-                {
-                    <option value="@a" selected="@(Model.SelectedAnnee == a ? "selected" : null)">
-                        @a
-                    </option>
-                }
             </select>
         </div>
+
     </form>
 </div>
 
@@ -81,16 +78,10 @@
                         <td>@s.Annee</td>
                         <td>@s.GroupName</td>
                         <td>
-                            <a asp-action="StudentDetails" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">
-                                Détails
-                            </a>
-                            <a asp-action="EditStudent" asp-route-id="@s.Id" class="btn btn-sm btn-primary">
-                                Modifier
-                            </a>
-                            <a asp-action="DeleteStudent" asp-route-id="@s.Id" class="btn btn-sm btn-danger" 
-                               onclick="return confirm('Voulez-vous vraiment supprimer cet étudiant ?');">
-                                Supprimer
-                            </a>
+                            <a asp-action="StudentDetails" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary">Détails</a>
+                            <a asp-action="EditStudent" asp-route-id="@s.Id" class="btn btn-sm btn-primary">Modifier</a>
+                            <a asp-action="DeleteStudent" asp-route-id="@s.Id" class="btn btn-sm btn-danger"
+                               onclick="return confirm('Voulez-vous vraiment supprimer cet étudiant ?');">Supprimer</a>
                         </td>
                     </tr>
                 }

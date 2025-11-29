@@ -66,8 +66,9 @@
                 <i class="fa fa-users me-3"></i><span class="nav-label">Utilisateurs</span>
             </a>
 
-            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Teachers" ? "active" : "")" href="/Admin/Teachers">
-                <i class="fa fa-chalkboard-user me-3"></i><span class="nav-label">Enseignants</span>
+            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["controller"]?.ToString() == "AdminTeacher" ? "active" : "")" href="/AdminTeacher">
+                <i class="fa fa-chalkboard-user me-3"></i>
+                <span class="nav-label">Enseignants</span>
             </a>
 
             <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Students" ? "active" : "")" href="/Admin/Students">

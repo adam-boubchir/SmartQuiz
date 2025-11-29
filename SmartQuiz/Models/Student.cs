@@ -22,6 +22,9 @@ namespace SmartQuiz.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> GroupIds { get; set; } = new List<string>();
 
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string GroupId { get; set; }   // 🔥 ajout important
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     }
 }
