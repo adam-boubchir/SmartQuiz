@@ -75,21 +75,24 @@
                 <i class="fa fa-user-graduate me-3"></i><span class="nav-label">Étudiants</span>
             </a>
 
-            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Modules" ? "active" : "")" href="/Admin/Modules">
-                <i class="fa fa-book me-3"></i><span class="nav-label">Modules</span>
+            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Modules" ? "active" : "")" 
+                href="/Admin/Modules">
+                <i class="fa fa-book me-3"></i>
+                <span class="nav-label">Modules</span>
             </a>
+
 
             <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "AllGroups" ? "active" : "")" href="/Admin/AllGroups">
                 <i class="fa fa-book me-3"></i><span class="nav-label">Groups</span>
             </a>
 
-            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")" href="/Admin/Settings">
+            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")" href="/AdminProfile/Settings">
                 <i class="fa fa-gear me-3"></i><span class="nav-label">Paramètres</span>
             </a>
 
             <hr style="border-color: rgba(255,255,255,0.25);" />
 
-            <a class="d-flex align-items-center" href="/Account/Profile">
+            <a class="d-flex align-items-center" href="/Admin/Profile">
                 <i class="fa fa-user me-3"></i><span class="nav-label">Profil</span>
             </a>
 

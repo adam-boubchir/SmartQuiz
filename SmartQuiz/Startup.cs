@@ -25,7 +25,7 @@ namespace SmartQuiz
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-
+            
             // -------------------------------------------------------
             // 1️⃣ MONGO DB
             // -------------------------------------------------------
@@ -54,13 +54,19 @@ namespace SmartQuiz
 
             // 👉 AJOUT MANQUANT (FIX DE TON ERREUR)
             services.AddScoped<IStudentService, StudentService>();
-
+            
             // -------------------------------------------------------
             // 3️⃣ CHAT SERVICES
             // -------------------------------------------------------
             services.AddSignalR();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChatContactService, ChatContactService>();
+            
+            // Pour injecter ModuleService sans interface
+            services.AddScoped<ModuleService>();
+
+            // OU si tu veux utiliser une interface propre :
+             services.AddScoped<IModuleService, ModuleService>();
 
             // -------------------------------------------------------
             // 4️⃣ SESSION

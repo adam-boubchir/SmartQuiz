@@ -17,12 +17,14 @@ namespace SmartQuiz.Controllers
         private readonly IStudentService _studentService;
 
         private readonly IGroupService _groupService;
+        private readonly ModuleService _moduleService;
 
-        public AdminController(IUserService userService, IStudentService studentService, IGroupService groupService)
+        public AdminController(IUserService userService, IStudentService studentService, IGroupService groupService, ModuleService moduleService)
         {
             _userService = userService;
             _studentService = studentService;
             _groupService = groupService;
+            _moduleService = moduleService;
         }
 
         public async Task<IActionResult> AllGroups(string? filiere, int? annee)
@@ -480,7 +482,52 @@ public async Task<IActionResult> DeleteStudent(string id)
             };
 
             return View(model);
+     
         }
+
+        public async Task<IActionResult> Modules()
+        {
+         var modules = await _moduleService.GetAllAsync(); // await OK
+         return View(modules);
+        }
+
+        public IActionResult CreateModule()
+{
+    return View();
+}
+
+[HttpPost]
+public async Task<IActionResult> CreateModule(string name)
+{
+    if (string.IsNullOrEmpty(name))
+    {
+        ModelState.AddModelError("", "Nom requis");
+        return View();
+    }
+
+    await _moduleService.CreateAsync(new Module { Name = name });
+    return RedirectToAction("Modules");
+}
+    public async Task<IActionResult> EditModule(string id)
+{
+    var module = await _moduleService.GetByIdAsync(id);
+    return View(module);
+}
+
+[HttpPost]
+public async Task<IActionResult> EditModule(Module module)
+{
+    await _moduleService.UpdateAsync(module.Id, module);
+    return RedirectToAction("Modules");
+}
+public async Task<IActionResult> DeleteModule(string id)
+{
+    await _moduleService.DeleteAsync(id);
+    return RedirectToAction("Modules");
+}
+
+
+    
     }
 }
 

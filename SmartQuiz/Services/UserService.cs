@@ -2,13 +2,16 @@
 using MongoDB.Bson;
 using MongoDB.Driver;
 using SmartQuiz.Models;
-
+using YourProject.Models;
 namespace SmartQuiz.Services
 {
     public class UserService : IUserService
     {
         private readonly IMongoCollection<User> _users;
         private readonly IMongoCollection<Student> _students;
+        private readonly IMongoCollection<Module> _modules;
+        private readonly IMongoCollection<Quiz> _quizzes;
+
 
 
         public UserService(IConfiguration config)
@@ -26,7 +29,7 @@ namespace SmartQuiz.Services
             var indexOptions = new CreateIndexOptions { Unique = true };
             _users.Indexes.CreateOne(new CreateIndexModel<User>(indexKeys, indexOptions));
         }
-
+     
         public async Task<User> GetByIdAsync(string id)
         {
            var objectId = ObjectId.Parse(id);
@@ -97,6 +100,7 @@ namespace SmartQuiz.Services
             await _users.DeleteOneAsync(u => u.Id == objectId);
         }
 
+
         public async Task ActivateUser(string id)
         {
             var objectId = ObjectId.Parse(id);
@@ -150,9 +154,35 @@ namespace SmartQuiz.Services
     await _users.UpdateOneAsync(filter, update);
 }
 
+    // -----------------------------
+        // Méthodes AdminProfile
+        // -----------------------------
+        public async Task<int> GetTotalModulesAsync()
+        {
+            return (int)await _modules.CountDocumentsAsync(FilterDefinition<Module>.Empty);
+        }
 
+        public async Task<int> GetTotalStudentsAsync()
+        {
+            return (int)await _users.CountDocumentsAsync(u => u.Role == "Student");
+        }
 
+        public async Task<int> GetTotalTeachersAsync()
+        {
+            return (int)await _users.CountDocumentsAsync(u => u.Role == "Teacher");
+        }
 
+        public async Task<int> GetTotalQuizzesAsync()
+        {
+            return (int)await _quizzes.CountDocumentsAsync(FilterDefinition<Quiz>.Empty);
+        }
+
+        public async Task<List<Module>> GetModulesAsync(string userId)
+        {
+            return await _modules.Find(m => m.TeacherIds.Contains(userId)).ToListAsync();
+        }
+
+     
 
 
 

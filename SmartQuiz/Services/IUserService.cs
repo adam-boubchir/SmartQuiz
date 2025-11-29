@@ -14,6 +14,14 @@ namespace SmartQuiz.Services
         Task ActivateUser(string id);
         Task<List<User>> GetPendingUsers();
         Task<bool> UpdateBasicInfoAsync(string userId, string username, string email);
+
+         
+        // Admin Profile helpers
+        Task<int> GetTotalModulesAsync();
+        Task<int> GetTotalStudentsAsync();
+        Task<int> GetTotalTeachersAsync();
+        Task<int> GetTotalQuizzesAsync();
+        Task<List<Module>> GetModulesAsync(string userId);
         
         Task CreateAsync(User user);
         Task UpdateAsync(User user);
