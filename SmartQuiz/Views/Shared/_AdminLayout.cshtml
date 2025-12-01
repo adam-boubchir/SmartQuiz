@@ -97,11 +97,13 @@
                 <i class="fa fa-user-graduate me-3"></i><span class="nav-label">Étudiants</span>
             </a>
 
-            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "Modules" ? "active" : "")" 
-                href="/Admin/Modules">
-                <i class="fa fa-book me-3"></i>
-                <span class="nav-label">Modules</span>
+            <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "ModulesAndSubjects" ? "active" : "")"
+                       asp-controller="AdminModuleSubject"
+                       asp-action="ModulesAndSubjects">
+                       <i class="fa fa-book me-3"></i>
+                       <span class="nav-label">Modules & Matières</span>
             </a>
+
 
 
             <a class="d-flex align-items-center @(ViewContext.RouteData.Values["action"]?.ToString() == "AllGroups" ? "active" : "")" href="/Admin/AllGroups">

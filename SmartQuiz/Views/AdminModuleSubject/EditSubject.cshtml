@@ -1,0 +1,19 @@
+@model SmartQuiz.Models.Subject
+
+@{
+    ViewData["Title"] = "Modifier Matière";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Modifier Matière</h2>
+
+<form asp-action="EditSubject" method="post">
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div class="mb-3">
+        <label for="Name" class="form-label">Nom de la Matière</label>
+        <input type="text" class="form-control" id="Name" name="Name" value="@Model.Name" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+</form>

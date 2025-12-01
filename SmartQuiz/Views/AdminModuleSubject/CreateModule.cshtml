@@ -1,0 +1,75 @@
+@model SmartQuiz.Models.Module
+
+@{
+    ViewData["Title"] = "Ajouter Module";
+}
+
+<h2 class="fw-bold mb-3">Ajouter un Module</h2>
+
+<form asp-action="CreateModule" method="post">
+    <div class="mb-3">
+        <label class="form-label">Nom du Module</label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Filière</label>
+        <input asp-for="Filiere" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Année</label>
+        <input asp-for="Annee" class="form-control" placeholder="2025 ou 2025-2026" />
+    </div>
+
+    <h4>Matière principale</h4>
+    <div class="mb-3">
+        <label class="form-label">Nom de la matière</label>
+        <input name="Subjects[0].SubjectName" class="form-control" />
+    </div>
+
+    <h5>Groupe principal</h5>
+    <div class="mb-3">
+        <label class="form-label">Nom du groupe</label>
+        <input name="Subjects[0].GroupAssignments[0].GroupName" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Enseignant</label>
+        <input id="teacherInput" name="Subjects[0].GroupAssignments[0].TeacherName" 
+               class="form-control" list="teachersList" autocomplete="off" />
+        <datalist id="teachersList"></datalist>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Heures</label>
+        <input name="Subjects[0].GroupAssignments[0].Hours" type="number" class="form-control" />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Ajouter Module</button>
+    <a asp-action="ModulesAndSubjects" class="btn btn-secondary ms-2">Annuler</a>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('teacherInput');
+    const datalist = document.getElementById('teachersList');
+
+    input.addEventListener('input', async function() {
+        const query = input.value;
+        if(!query) return;
+
+        try {
+            const response = await fetch(`/AdminModuleSubject/SearchTeachers?query=${query}`);
+            if(!response.ok) throw new Error("Erreur API");
+
+            const data = await response.json();
+            datalist.innerHTML = '';
+
+            data.forEach(name => {
+                const option = document.createElement('option');
+                option.value = name;
+                datalist.appendChild(option);
+            });
+        } catch (err) {
+            console.error("Erreur fetch enseignants:", err);
+        }
+    });
+});
+</script>

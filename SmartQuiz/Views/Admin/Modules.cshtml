@@ -1,7 +1,7 @@
 @model List<SmartQuiz.Models.Module>
 
 @{
-    ViewData["Title"] = "Liste des Modules";
+    ViewData["Title"] = "Modules";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
@@ -10,24 +10,43 @@
     <a class="btn btn-primary" asp-action="CreateModule">➕ Ajouter Module</a>
 </div>
 
-<table class="table table-bordered shadow-sm">
-    <thead class="table-light">
-        <tr>
-            <th>Nom du Module</th>
-            <th style="width: 200px;">Actions</th>
-        </tr>
-    </thead>
-
-    <tbody>
-        @foreach (var m in Model)
-        {
-            <tr>
-                <td>@m.Name</td>
-                <td>
-                  <a class="btn btn-sm btn-warning" asp-action="EditModule" asp-route-id="@m.Id">Modifier</a>
-                  <a class="btn btn-sm btn-danger" asp-action="DeleteModule" asp-route-id="@m.Id">Supprimer</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-info">Aucun module enregistré.</div>
+}
+else
+{
+    @foreach (var module in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-header">
+                <strong>@module.Name</strong> – @module.Filiere (Année @module.Annee)
+            </div>
+            <div class="card-body">
+                @foreach (var subj in module.Subjects)
+                {
+                    <h5>@subj.SubjectName</h5>
+                    <table class="table table-sm table-bordered mb-3">
+                        <thead>
+                            <tr>
+                                <th>Groupe</th>
+                                <th>Professeur</th>
+                                <th>Heures</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var g in subj.GroupAssignments)
+                            {
+                                <tr>
+                                    <td>@g.GroupName</td>
+                                    <td>@g.TeacherName</td>
+                                    <td>@g.Hours</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    }
+}

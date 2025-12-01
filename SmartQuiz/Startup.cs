@@ -66,7 +66,9 @@ namespace SmartQuiz
             services.AddScoped<ModuleService>();
 
             // OU si tu veux utiliser une interface propre :
-             services.AddScoped<IModuleService, ModuleService>();
+            services.AddScoped<IModuleService, ModuleService>();
+            services.AddScoped<ISubjectService, SubjectService>();
+
 
             // -------------------------------------------------------
             // 4️⃣ SESSION

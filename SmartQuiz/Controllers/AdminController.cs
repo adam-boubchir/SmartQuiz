@@ -485,49 +485,9 @@ public async Task<IActionResult> DeleteStudent(string id)
      
         }
 
-        public async Task<IActionResult> Modules()
-        {
-         var modules = await _moduleService.GetAllAsync(); // await OK
-         return View(modules);
-        }
-
-        public IActionResult CreateModule()
-{
-    return View();
-}
-
-[HttpPost]
-public async Task<IActionResult> CreateModule(string name)
-{
-    if (string.IsNullOrEmpty(name))
-    {
-        ModelState.AddModelError("", "Nom requis");
-        return View();
-    }
-
-    await _moduleService.CreateAsync(new Module { Name = name });
-    return RedirectToAction("Modules");
-}
-    public async Task<IActionResult> EditModule(string id)
-{
-    var module = await _moduleService.GetByIdAsync(id);
-    return View(module);
-}
-
-[HttpPost]
-public async Task<IActionResult> EditModule(Module module)
-{
-    await _moduleService.UpdateAsync(module.Id, module);
-    return RedirectToAction("Modules");
-}
-public async Task<IActionResult> DeleteModule(string id)
-{
-    await _moduleService.DeleteAsync(id);
-    return RedirectToAction("Modules");
-}
-
-
+    
     
     }
+
 }
 

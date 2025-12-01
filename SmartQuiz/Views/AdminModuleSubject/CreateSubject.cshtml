@@ -1,0 +1,17 @@
+@model SmartQuiz.Models.Subject
+
+@{
+    ViewData["Title"] = "Ajouter Matière";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2>Ajouter une Matière</h2>
+
+<form asp-action="CreateSubject" method="post">
+    <div class="mb-3">
+        <label for="Name" class="form-label">Nom de la Matière</label>
+        <input type="text" class="form-control" id="Name" name="name" required />
+    </div>
+
+    <button type="submit" class="btn btn-success">Ajouter</button>
+</form>
