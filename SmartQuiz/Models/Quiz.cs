@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace YourProject.Models
 {
+    [BsonIgnoreExtraElements]
     public class Quiz
     {
         [BsonId]
@@ -19,6 +20,10 @@ namespace YourProject.Models
 
         [BsonRepresentation(BsonType.ObjectId)]
         public string GroupId { get; set; }
+
+        [BsonElement("subjectName")]
+        public string SubjectName { get; set; }
+
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 

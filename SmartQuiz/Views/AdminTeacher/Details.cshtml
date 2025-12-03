@@ -1,0 +1,173 @@
+@model SmartQuiz.Models.TeacherFullInfoViewModel
+
+@{
+    ViewData["Title"] = "Détails de l'enseignant";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="fw-bold mb-4">Détails de l’Enseignant</h2>
+
+<!-- ===================== SECTION 1 : INFOS PERSONNELLES ===================== -->
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Informations personnelles</span>
+
+        <a asp-action="EditTeacher" asp-route-id="@Model.Id" class="btn btn-light btn-sm fw-bold">
+            <i class="fa fa-edit"></i> Modifier
+        </a>
+    </div>
+
+    <div class="card-body">
+        <p><strong>Nom :</strong> @Model.FullName</p>
+        <p><strong>Email :</strong> @Model.Email</p>
+        <p><strong>Total des heures assignées :</strong> 
+            <span class="fw-bold text-success">@Model.TotalHours h</span>
+        </p>
+    </div>
+</div>
+
+
+<!-- ===================== SECTION 2 : GROUPES ===================== -->
+<div class="card mb-4">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Groupes assignés</span>
+
+        <a asp-action="EditGroups" asp-route-id="@Model.Id" class="btn btn-light btn-sm fw-bold">
+            <i class="fa fa-edit"></i> Modifier
+        </a>
+    </div>
+
+    <div class="card-body">
+        @if (Model.Groups != null && Model.Groups.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead class="table-secondary">
+                    <tr>
+                        <th>Nom du groupe</th>
+                        <th>Filière</th>
+                        <th>Année</th>
+                        <th>Matière</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var g in Model.Groups)
+                    {
+                        <tr>
+                            <td>@g.Name</td>
+                            <td>@g.Filiere</td>
+                            <td>@g.Annee</td>
+                            <td>@g.Subject</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted">Aucun groupe assigné.</p>
+        }
+    </div>
+</div>
+
+
+<!-- ===================== SECTION 3 : MODULES & MATIÈRES ===================== -->
+<div class="card mb-4">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Modules, matières et heures</span>
+
+        <a asp-action="EditTeacherModules" asp-route-id="@Model.Id" class="btn btn-light btn-sm fw-bold">
+            <i class="fa fa-edit"></i> Modifier
+        </a>
+    </div>
+
+    <div class="card-body">
+        @if (Model.Modules != null && Model.Modules.Any())
+        {
+            foreach (var module in Model.Modules)
+            {
+                <div class="mb-4 border p-3 rounded">
+                    <h5 class="fw-bold">@module.Name</h5>
+                    <p>
+                        <strong>Filière :</strong> @module.Filiere <br />
+                        <strong>Année :</strong> @module.Annee
+                    </p>
+
+                    <!-- Matières -->
+                    @if (module.Subjects != null && module.Subjects.Any())
+                    {
+                        <h6 class="mt-2">Matières :</h6>
+                        <ul>
+                            @foreach (var s in module.Subjects)
+                            {
+                                <li>
+                                    <strong>@s.SubjectName</strong>
+
+                                    <ul>
+                                        @foreach (var ga in s.GroupAssignments)
+                                        {
+                                            <li>
+                                                Groupe : <strong>@ga.GroupName</strong> — 
+                                                Heures : <span class="text-success fw-bold">@ga.Hours h</span>
+                                            </li>
+                                        }
+                                    </ul>
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-muted">Aucune matière assignée.</p>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <p class="text-muted">Aucun module.</p>
+        }
+    </div>
+</div>
+
+
+<!-- ===================== SECTION 4 : QUIZZES ===================== -->
+<div class="card mb-4">
+    <div class="card-header bg-warning d-flex justify-content-between align-items-center">
+        <span class="fw-bold">Quizzes créés</span>
+
+        <a asp-action="EditTeacherQuizzes" asp-route-id="@Model.Id" class="btn btn-dark btn-sm fw-bold">
+            <i class="fa fa-edit"></i> Modifier
+        </a>
+    </div>
+
+    <div class="card-body">
+        @if (Model.Quizzes != null && Model.Quizzes.Any())
+        {
+            <table class="table table-bordered table-striped">
+                <thead class="table-light">
+                    <tr>
+                        <th>Titre</th>
+                        <th>Groupe</th>
+                        <th>Matière</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var q in Model.Quizzes)
+                    {
+                        <tr>
+                            <td>@q.Title</td>
+                            <td>@q.GroupName</td>
+                            <td>@q.SubjectName</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p class="text-muted">Aucun quiz créé par cet enseignant.</p>
+        }
+    </div>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Retour à la liste</a>

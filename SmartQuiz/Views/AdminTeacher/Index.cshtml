@@ -12,47 +12,18 @@
     </div>
 }
 
-
 <div class="fade-up mb-4">
-    <h2 class="fw-bold">Statistiques des Enseignants</h2>
-    <p class="text-muted">Aperçu global des enseignants et de leurs affectations</p>
+    <h2 class="fw-bold">Liste des Enseignants</h2>
+    <p class="text-muted">Nom et email des enseignants</p>
 </div>
 
-<!-- FILTRES -->
-<div class="mb-4">
-    <form method="get" class="row g-3">
-        <div class="col-md-4">
-            <select name="subject" class="form-select" asp-items="Model.SubjectSelectList">
-                  <option value="">-- Toutes les matières --</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <select name="group" class="form-select" asp-items="Model.GroupSelectList">
-                  <option value="">-- Tous les groupes --</option>
-            </select>
-        </div>
-        <div class="col-md-4">
-            <button type="submit" class="btn btn-primary w-100">Filtrer</button>
-        </div>
-    </form>
-</div>
-
-<!-- STATISTIQUES -->
-<div class="mb-4">
-    <p>Total enseignants : <strong>@Model.TotalTeachers</strong></p>
-    <p>Enseignants avec groupes assignés : <strong>@Model.TeachersWithGroups</strong></p>
-</div>
-
-<!-- TABLEAU -->
+<!-- TABLEAU SIMPLIFIÉ -->
 <table class="table table-striped">
     <thead>
         <tr>
             <th>Nom</th>
             <th>Email</th>
-            <th>Matières</th>
-            <th>Groupes assignés</th>
-            <th>Heures assignées</th>
-            <th>Actions</th> <!-- Colonne pour gérer les comptes -->
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -61,13 +32,9 @@
             <tr>
                 <td>@t.FullName</td>
                 <td>@t.Email</td>
-                <td>@string.Join(", ", t.Subjects)</td>
-                <td>@t.GroupsAssigned</td>
-                <td>@t.TotalHours</td>
                 <td>
-                    <a class="btn btn-sm btn-primary" asp-action="EditTeacher" asp-route-id="@t.Id">Modifier</a>
+                    <a class="btn btn-sm btn-primary" asp-action="Details" asp-route-id="@t.Id">Détails</a>
                     <a class="btn btn-sm btn-danger" asp-action="DeleteTeacher" asp-route-id="@t.Id" onclick="return confirm('Supprimer cet enseignant ?');">Supprimer</a>
-                    <a class="btn btn-sm btn-secondary" asp-action="AssignGroupsSubjects" asp-route-id="@t.Id">Assigner Groupes</a>
                 </td>
             </tr>
         }

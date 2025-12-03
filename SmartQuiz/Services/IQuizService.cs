@@ -16,6 +16,7 @@ namespace YourProject.Services
 
         // ⭐ IMPORTANT POUR LES ÉTUDIANTS
        
+        Task<List<Quiz>> GetAllAsync();
 
         Task CreateAsync(Quiz quiz);
         Task UpdateAsync(Quiz quiz);

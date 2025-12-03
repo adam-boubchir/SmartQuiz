@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using SmartQuiz.Models;
 using SmartQuiz.Services;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using YourProject.Services;
+using YourProject.Models;
 
 namespace SmartQuiz.Controllers
 {
@@ -10,204 +13,312 @@ namespace SmartQuiz.Controllers
     {
         private readonly IUserService _userService;
         private readonly IGroupService _groupService;
+        private readonly IModuleService _moduleService;
+        private readonly IQuizService _quizService;
 
-        public AdminTeacherController(IUserService userService, IGroupService groupService)
+        public AdminTeacherController(
+            IUserService userService,
+            IGroupService groupService,
+            IModuleService moduleService,
+            IQuizService quizService)
         {
             _userService = userService;
             _groupService = groupService;
+            _moduleService = moduleService;
+            _quizService = quizService;
         }
 
-        // PAGE STATISTIQUES ENSEIGNANTS
-        public async Task<IActionResult> Index(string? subject)
+        // ------------------------------
+        // Liste des enseignants
+        // ------------------------------
+        public async Task<IActionResult> Index()
         {
-            // 1️⃣ Récupérer tous les utilisateurs
             var allUsers = await _userService.GetAllUsers();
-
-            // 2️⃣ Filtrer uniquement les enseignants
             var teachers = allUsers.Where(u => u.Role == "Teacher").ToList();
 
-            // 3️⃣ Récupérer toutes les matières disponibles
-            var allSubjects = teachers.SelectMany(t => t.SubjectIds ?? new List<string>())
-                                      .Distinct()
-                                      .OrderBy(s => s)
-                                      .ToList();
-
-            // 4️⃣ Appliquer le filtre matière si fourni
-            if (!string.IsNullOrEmpty(subject))
-                teachers = teachers.Where(t => t.SubjectIds.Contains(subject)).ToList();
-
-            // 5️⃣ Construire le ViewModel
             var model = new AdminTeachersViewModel
             {
-                SelectedSubject = subject,
-                Subjects = allSubjects,
                 TotalTeachers = teachers.Count,
-                TeachersWithGroups = teachers.Count(t => t.GroupIds != null && t.GroupIds.Count > 0),
                 Teachers = teachers.Select(t => new TeacherInfoViewModel
                 {
                     Id = t.Id.ToString(),
                     FullName = t.Username,
-                    Email = t.Email,
-                    Subjects = t.SubjectIds,
-                    GroupsAssigned = t.GroupIds?.Count ?? 0,
-                    TotalHours = t.AssignedHours
+                    Email = t.Email
                 }).ToList()
             };
 
             return View(model);
         }
 
-        // OPTIONNEL : détails d'un enseignant
+        // ------------------------------
+        // Détails d'un enseignant
+        // ------------------------------
         public async Task<IActionResult> Details(string id)
         {
-            if (string.IsNullOrEmpty(id))
-                return NotFound();
+            if (string.IsNullOrEmpty(id)) return RedirectToAction("Index");
 
-            var teacher = await _userService.GetByIdAsync(id);
+            var allUsers = await _userService.GetAllUsers();
+            var teacher = allUsers.FirstOrDefault(u => u.Id.ToString() == id && u.Role == "Teacher");
+            if (teacher == null) return NotFound();
 
-            if (teacher == null || teacher.Role != "Teacher")
-                return NotFound();
+            var allGroups = await _groupService.GetAllAsync();
+            var allModules = await _moduleService.GetAllAsync();
+            var allQuizzes = await _quizService.GetAllAsync();
 
-            var model = new TeacherInfoViewModel
+            // Groupes du professeur
+            var teacherGroups = allGroups
+                .Where(g => g.TeacherId == teacher.Id.ToString())
+                .Select(g => new GroupInfo
+                {
+                    Name = g.Name,
+                    Filiere = g.Filiere,
+                    Annee = g.Annee,
+                    Subject = g.Subject
+                })
+                .ToList();
+
+            // ------------------------------
+            // MODULES AVEC SUBJECTS + GROUPES
+            // ------------------------------
+            var teacherModules = new List<ModuleInfo>();
+            int totalHours = 0;
+
+            foreach (var m in allModules)
+            {
+                var subjectsForTeacher = new List<ModuleSubjectViewModel>();
+
+                if (m.Subjects != null)
+                {
+                    foreach (var s in m.Subjects)
+                    {
+                        if (s.GroupAssignments == null) continue;
+
+                        var relevantAssignments = s.GroupAssignments
+                            .Where(ga => ga.TeacherName == teacher.Username)
+                            .Select(ga =>
+                            {
+                                totalHours += ga.Hours;
+                                return new ModuleGroupAssignment
+                                {
+                                    GroupName = ga.GroupName,
+                                    TeacherName = ga.TeacherName,
+                                    Hours = ga.Hours
+                                };
+                            })
+                            .ToList();
+
+                        if (relevantAssignments.Any())
+                        {
+                            subjectsForTeacher.Add(new ModuleSubjectViewModel
+                            {
+                                SubjectName = s.SubjectName,
+                                GroupAssignments = relevantAssignments
+                            });
+                        }
+                    }
+                }
+
+                if (subjectsForTeacher.Any())
+                {
+                    teacherModules.Add(new ModuleInfo
+                    {
+                        Name = m.Name,
+                        Filiere = m.Filiere,
+                        Annee = int.TryParse(m.Annee, out var a) ? a : 0,
+                        Subjects = subjectsForTeacher
+                    });
+                }
+            }
+
+            // ------------------------------
+            // QUIZZES DU PROF
+            // ------------------------------
+            var teacherQuizzes = allQuizzes
+                .Where(q => q.CreatedBy == teacher.Id.ToString())
+                .Select(q => new QuizInfo
+                {
+                    Title = q.Title,
+                    GroupName = allGroups.FirstOrDefault(g => g.Id == q.GroupId)?.Name,
+                    SubjectName = q.SubjectName
+                })
+                .ToList();
+
+            // ------------------------------
+            // FINAL MODEL
+            // ------------------------------
+            var model = new TeacherFullInfoViewModel
             {
                 Id = teacher.Id.ToString(),
                 FullName = teacher.Username,
                 Email = teacher.Email,
-                Subjects = teacher.SubjectIds,
-                GroupsAssigned = teacher.GroupIds?.Count ?? 0,
-                TotalHours = teacher.AssignedHours
+                Groups = teacherGroups,
+                Modules = teacherModules,
+                Quizzes = teacherQuizzes,
+                TotalHours = totalHours
             };
 
             return View(model);
         }
 
-        // GET : Modifier un enseignant
-// GET : Modifier un enseignant (nom et email seulement)
-[HttpGet]
-public async Task<IActionResult> EditTeacher(string id)
+        // ===================== EDIT INFOS PERSONNELLES =====================
+        [HttpGet]
+        public async Task<IActionResult> EditTeacher(string id)
+        {
+            if (string.IsNullOrEmpty(id)) return RedirectToAction("Index");
+
+            var allUsers = await _userService.GetAllUsers();
+            var teacher = allUsers.FirstOrDefault(u => u.Id.ToString() == id && u.Role == "Teacher");
+            if (teacher == null) return NotFound();
+
+            var model = new TeacherFullInfoViewModel
+            {
+              Id = teacher.Id.ToString(),
+              FullName = teacher.Username,
+              Email = teacher.Email
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+public async Task<IActionResult> EditTeacher(TeacherFullInfoViewModel model)
 {
-    if (string.IsNullOrEmpty(id))
-        return NotFound();
+    if (!ModelState.IsValid) return View(model);
 
-    var teacher = await _userService.GetByIdAsync(id);
-    if (teacher == null || teacher.Role != "Teacher")
-        return NotFound();
+    var teacher = await _userService.GetByIdAsync(model.Id);
+    if (teacher == null) return NotFound();
 
-    var model = new EditTeacherViewModel
+    teacher.Username = model.FullName;
+    teacher.Email = model.Email;
+
+    await _userService.UpdateAsync(teacher);
+
+    return RedirectToAction("Details", new { id = model.Id });
+}
+
+// ===================== EDIT GROUPS =====================
+[HttpGet]
+public async Task<IActionResult> EditGroups(string id)
+{
+    if (string.IsNullOrEmpty(id)) return RedirectToAction("Index");
+
+    var allGroups = await _groupService.GetAllAsync();
+    var teacherGroups = allGroups.Where(g => g.TeacherId == id).ToList();
+
+    return View(teacherGroups); // Créer une vue correspondante
+}
+
+// [HttpPost] pour sauvegarder les modifications des groupes
+[HttpPost]
+public async Task<IActionResult> EditGroups(string id, List<Group> groups)
+{
+    foreach (var g in groups)
     {
-        Id = teacher.Id.ToString(),
-        FullName = teacher.Username,
-        Email = teacher.Email
+        await _groupService.UpdateAsync(g);
+    }
+
+    return RedirectToAction("Details", new { id });
+}
+
+// ===================== EDIT MODULES =====================
+[HttpGet]
+public async Task<IActionResult> EditTeacherModules(string id)
+{
+    if (string.IsNullOrEmpty(id)) return RedirectToAction("Index");
+
+    var allModules = await _moduleService.GetAllAsync();
+
+    // Filtrer uniquement les modules où l'enseignant est assigné
+    var teacherModules = allModules
+        .Where(m => m.TeacherIds != null && m.TeacherIds.Contains(id))
+        .Select(m => new ModuleEditViewModel
+        {
+            Id = m.Id,
+            Name = m.Name,
+            Filiere = m.Filiere,
+            Annee = int.TryParse(m.Annee, out var annee) ? annee : 0,
+            Subjects = (m.Subjects ?? new List<ModuleSubject>())
+                .Where(s => !string.IsNullOrEmpty(s.SubjectName)) // filtrer les subjects vides
+                .Select(s => new ModuleSubjectEditViewModel
+                {
+                    SubjectName = s.SubjectName,
+                    GroupAssignments = (s.GroupAssignments ?? new List<ModuleGroupAssignment>())
+                        .Select(ga => new ModuleGroupAssignmentEditViewModel
+                        {
+                            GroupName = ga.GroupName,
+                            Hours = ga.Hours
+                        }).ToList()
+                }).ToList()
+        })
+        .ToList();
+
+    var model = new EditTeacherModulesViewModel
+    {
+        TeacherId = id,
+        Modules = teacherModules
     };
 
     return View(model);
 }
 
-// POST : Modifier un enseignant (nom et email seulement)
+
 [HttpPost]
-public async Task<IActionResult> EditTeacher(EditTeacherViewModel model)
+public async Task<IActionResult> EditTeacherModules(EditTeacherModulesViewModel model)
 {
-    if (!ModelState.IsValid)
+    if (!ModelState.IsValid) return View(model);
+
+    foreach (var m in model.Modules)
     {
-        return View(model);
+        // Récupérer le module existant
+        var module = await _moduleService.GetByIdAsync(m.Id);
+        if (module == null) continue;
+
+        module.Name = m.Name;
+        module.Filiere = m.Filiere;
+        module.Annee = m.Annee.ToString();
+
+        // Mettre à jour les matières et heures
+        module.Subjects = m.Subjects.Select(s => new ModuleSubject
+        {
+            SubjectName = s.SubjectName,
+            GroupAssignments = s.GroupAssignments.Select(ga => new ModuleGroupAssignment
+            {
+                GroupName = ga.GroupName,
+                Hours = ga.Hours,
+                TeacherName = "" // optionnel si nécessaire
+            }).ToList()
+        }).ToList();
+
+        // ✅ Fournir ID et objet Module
+        await _moduleService.UpdateAsync(module.Id, module);
     }
 
-    var teacher = await _userService.GetByIdAsync(model.Id);
-    if (teacher == null || teacher.Role != "Teacher")
-        return NotFound();
-
-    teacher.Username = model.FullName;
-    teacher.Email = model.Email;
-
-    // Appeler la méthode du service pour mettre à jour seulement le nom et l'email
-    await _userService.UpdateBasicInfoAsync(
-        teacher.Id.ToString(),
-        teacher.Username,
-        teacher.Email
-    );
-
-    return RedirectToAction("Index");
+    return RedirectToAction("Details", new { id = model.TeacherId });
 }
 
-
-    // GET : Page assignation groupes et matières
+// ===================== EDIT QUIZZES =====================
 [HttpGet]
-public async Task<IActionResult> AssignGroupsSubjects(string id)
+public async Task<IActionResult> EditTeacherQuizzes(string id)
 {
-    if (string.IsNullOrEmpty(id))
-        return NotFound();
+    if (string.IsNullOrEmpty(id)) return RedirectToAction("Index");
 
-    var teacher = await _userService.GetByIdAsync(id);
-    if (teacher == null || teacher.Role != "Teacher")
-        return NotFound();
+    var quizzes = (await _quizService.GetAllAsync())
+        .Where(q => q.CreatedBy == id)
+        .ToList();
 
-    var allGroups = await _groupService.GetAllAsync();
-
-    var model = new EditTeacherViewModel
-{
-    Id = teacher.Id.ToString(),
-    FullName = teacher.Username,
-    Email = teacher.Email,
-    Groups = allGroups,
-    SelectedGroupIds = teacher.GroupIds ?? new List<string>(),
-    Subjects = teacher.SubjectIds ?? new List<string>(),
-    SelectedSubjects = teacher.SubjectIds ?? new List<string>(),
-    AssignedHours = teacher.AssignedHours // ajouter ici
-};
-
-
-    return View(model);
+    return View(quizzes);
 }
 
-// POST : Sauvegarder groupes et matières assignés
-       [HttpPost]
-public async Task<IActionResult> AssignGroupsSubjects(EditTeacherViewModel model)
+[HttpPost]
+public async Task<IActionResult> EditTeacherQuizzes(string id, List<Quiz> quizzes)
 {
-    if (!ModelState.IsValid)
+    foreach (var q in quizzes)
     {
-        model.Groups = await _groupService.GetAllAsync();
-        return View(model);
+        await _quizService.UpdateAsync(q);
     }
 
-    var teacher = await _userService.GetByIdAsync(model.Id);
-    if (teacher == null || teacher.Role != "Teacher")
-        return NotFound();
-
-    // Ajouter un nouveau groupe si saisi
-    if (!string.IsNullOrEmpty(model.NewGroupName))
-    {
-        var newGroup = new Group { Name = model.NewGroupName };
-        await _groupService.CreateAsync(newGroup); // créer dans MongoDB
-        model.SelectedGroupIds.Add(newGroup.Id);   // l'ajouter à la sélection
-    }
-
-    // Ajouter une nouvelle matière si saisi
-    if (!string.IsNullOrEmpty(model.NewSubjectName))
-    {
-        model.SelectedSubjects.Add(model.NewSubjectName);
-    }
-
-    // Mettre à jour l'enseignant
-    teacher.GroupIds = model.SelectedGroupIds;
-    teacher.SubjectIds = model.SelectedSubjects;
-    teacher.AssignedHours = model.AssignedHours;
-
-    await _userService.UpdateTeacherBasicInfoAsync(
-        teacher.Id.ToString(),
-        teacher.Username,
-        teacher.Email,
-        teacher.GroupIds,
-        teacher.SubjectIds,
-        teacher.AssignedHours
-    );
-
-    // Message de confirmation
-    TempData["SuccessMessage"] = $"Modifications pour {teacher.Username} enregistrées avec succès !";
-
-    // Rediriger vers la page Index
-    return RedirectToAction("Index");
+    return RedirectToAction("Details", new { id });
 }
-
 
     }
 }

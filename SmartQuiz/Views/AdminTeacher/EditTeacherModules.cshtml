@@ -1,0 +1,64 @@
+@model SmartQuiz.Models.EditTeacherModulesViewModel
+
+@{
+    ViewData["Title"] = "Modifier les modules de l'enseignant";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="fw-bold mb-4">Modifier les modules de l'enseignant</h2>
+
+<form asp-action="EditTeacherModules" method="post">
+    <input type="hidden" asp-for="TeacherId" />
+
+    @if (Model.Modules != null && Model.Modules.Any())
+    {
+        foreach (var module in Model.Modules)
+        {
+            <div class="card mb-4 p-3 border rounded">
+                <h5 class="fw-bold">Module: @module.Name</h5>
+                <div class="mb-2">
+                    <label class="form-label">Nom du module</label>
+                    <input type="text" class="form-control" asp-for="@module.Name" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Filière</label>
+                    <input type="text" class="form-control" asp-for="@module.Filiere" />
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Année</label>
+                    <input type="number" class="form-control" asp-for="@module.Annee" />
+                </div>
+
+                <h6>Matières :</h6>
+                @for (int i = 0; i < module.Subjects.Count; i++)
+                {
+                    var subject = module.Subjects[i];
+                    <div class="border p-2 mb-2 rounded">
+                        <label class="form-label">Nom de la matière</label>
+                        <input type="text" class="form-control" asp-for="@module.Subjects[i].SubjectName" />
+
+                        <h6 class="mt-2">Groupes et heures :</h6>
+                        @for (int j = 0; j < subject.GroupAssignments.Count; j++)
+                        {
+                            var ga = subject.GroupAssignments[j];
+                            <div class="mb-2">
+                                <label class="form-label">Groupe</label>
+                                <input type="text" class="form-control" asp-for="@module.Subjects[i].GroupAssignments[j].GroupName" />
+
+                                <label class="form-label">Heures</label>
+                                <input type="number" class="form-control" asp-for="@module.Subjects[i].GroupAssignments[j].Hours" />
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    }
+    else
+    {
+        <p class="text-muted">Aucun module assigné à cet enseignant.</p>
+    }
+
+    <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
+    <a asp-action="Details" asp-route-id="@Model.TeacherId" class="btn btn-secondary">Annuler</a>
+</form>

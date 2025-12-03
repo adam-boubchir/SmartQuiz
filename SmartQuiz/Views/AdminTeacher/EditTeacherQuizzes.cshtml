@@ -1,0 +1,33 @@
+@model List<YourProject.Models.Quiz>
+
+@{
+    ViewData["Title"] = "Modifier les quizzes de l'enseignant";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 class="fw-bold mb-4">Modifier les quizzes créés</h2>
+
+<form asp-action="EditTeacherQuizzes" method="post">
+    <input type="hidden" name="id" value="@Model.FirstOrDefault()?.CreatedBy" />
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Titre</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td><input type="text" name="quizzes[@i].Title" value="@Model[i].Title" class="form-control" /></td>
+                    <td><input type="text" name="quizzes[@i].Description" value="@Model[i].Description" class="form-control" /></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-primary">Sauvegarder</button>
+    <a asp-action="Details" asp-route-id="@Model.FirstOrDefault()?.CreatedBy" class="btn btn-secondary">Annuler</a>
+</form>

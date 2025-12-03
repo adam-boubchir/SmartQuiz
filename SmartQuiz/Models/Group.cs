@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace SmartQuiz.Models   // FIX
 {
+    [BsonIgnoreExtraElements]
     public class Group
     {
         [BsonId]

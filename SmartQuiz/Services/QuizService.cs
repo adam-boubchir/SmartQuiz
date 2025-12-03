@@ -67,6 +67,12 @@ namespace YourProject.Services
         {
             await _collection.DeleteOneAsync(q => q.Id == id);
         }
+
+        public async Task<List<Quiz>> GetAllAsync()
+        {
+            return await _collection.Find(_ => true).ToListAsync();
+        }
+    
     }
 
 }

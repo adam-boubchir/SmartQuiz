@@ -5,6 +5,7 @@ using System.Collections.Generic;
 
 namespace SmartQuiz.Models
 {
+    [BsonIgnoreExtraElements]
     public class User
     {
         [BsonId]

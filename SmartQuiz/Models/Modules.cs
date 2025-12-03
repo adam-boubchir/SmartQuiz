@@ -20,6 +20,13 @@ namespace SmartQuiz.Models
         public List<ModuleSubject> Subjects { get; set; } = new List<ModuleSubject>();
 
         public List<string> TeacherIds { get; set; } = new List<string>();
+
+
+        // Propriété pour GroupAssignments
+        [BsonElement("GroupAssignments")]
+        public List<GroupAssignment> GroupAssignments { get; set; } = new List<GroupAssignment>();
+
+
     }
 
     public class ModuleSubject
@@ -36,5 +43,25 @@ namespace SmartQuiz.Models
         public string GroupName { get; set; }
         public string TeacherName { get; set; }
         public int Hours { get; set; } // heures pour ce groupe
+    }
+
+    public class SubjectInModule
+    {
+        [BsonElement("SubjectName")]
+        public string SubjectName { get; set; }
+    }
+    public class GroupAssignment
+    {
+        [BsonElement("GroupName")]
+        public string GroupName { get; set; }
+
+        [BsonElement("TeacherName")]
+        public string TeacherName { get; set; }
+
+        [BsonElement("Hours")]
+
+        public int Hours { get; set; }
+        [BsonElement("SubjectName")]
+        public string SubjectName { get; set; }
     }
 }

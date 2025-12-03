@@ -5,7 +5,7 @@ namespace SmartQuiz.Models
     public class ModulesViewModel
     {
         public List<ModuleRowViewModel> Modules { get; set; } = new List<ModuleRowViewModel>();
-       
+        
     }
 
     public class ModuleRowViewModel
