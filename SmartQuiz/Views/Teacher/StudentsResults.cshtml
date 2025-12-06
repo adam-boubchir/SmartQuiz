@@ -1,0 +1,45 @@
+﻿@model List<SmartQuiz.Models.StudentResultViewModel>
+
+@{
+    ViewData["Title"] = "Résultats des étudiants";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<h2 class="mt-3 mb-4 text-center">📘 Résultats des étudiants</h2>
+
+<table class="table table-bordered table-hover">
+    <thead class="table-dark">
+        <tr>
+            <th>Étudiant</th>
+            <th>Groupe</th>
+            <th class="text-center">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            foreach (var student in Model)
+            {
+                <tr>
+                    <td>@student.StudentName</td>
+                    <td>@student.GroupName</td>
+                    <td class="text-center">
+                        <a class="btn btn-primary btn-sm"
+                           asp-action="StudentDetails"
+                           asp-route-studentId="@student.StudentId">
+                            Voir les résultats 📊
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <td colspan="3" class="text-center text-muted">
+                    Aucun étudiant trouvé.
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -25,9 +25,9 @@ namespace SmartQuiz
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            
+
             // -------------------------------------------------------
-            // 1️⃣ MONGO DB
+            // 1️⃣ MONGO DB CONNECTION
             // -------------------------------------------------------
             services.AddSingleton<IMongoClient>(sp =>
                 new MongoClient(Configuration["MongoDB:ConnectionString"])
@@ -40,7 +40,7 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 2️⃣ CORE SERVICES
+            // 2️⃣ CORE SERVICES (SmartQuiz)
             // -------------------------------------------------------
             services.AddSingleton<MongoDbService>();
 
@@ -51,27 +51,27 @@ namespace SmartQuiz
             services.AddScoped<ITeacherService, TeacherService>();
             services.AddScoped<IStudentProfileService, StudentProfileService>();
             services.AddScoped<IStudentAnswerService, StudentAnswerService>();
-
-            // 👉 AJOUT MANQUANT (FIX DE TON ERREUR)
             services.AddScoped<IStudentService, StudentService>();
-            
+
+            // ⭐️⭐️ IMPORTANT : SERVICE POUR LES RÉSULTATS ⭐️⭐️
+            services.AddScoped<IResultService, ResultService>();
+
             // -------------------------------------------------------
-            // 3️⃣ CHAT SERVICES
+            // 3️⃣ CHAT SERVICES (SignalR)
             // -------------------------------------------------------
             services.AddSignalR();
             services.AddScoped<IMessageService, MessageService>();
             services.AddScoped<IChatContactService, ChatContactService>();
-            
-            // Pour injecter ModuleService sans interface
-            services.AddScoped<ModuleService>();
-
-            // OU si tu veux utiliser une interface propre :
-            services.AddScoped<IModuleService, ModuleService>();
-            services.AddScoped<ISubjectService, SubjectService>();
-
 
             // -------------------------------------------------------
-            // 4️⃣ SESSION
+            // 4️⃣ MODULE / SUBJECT SERVICES
+            // -------------------------------------------------------
+            services.AddScoped<ModuleService>(); // sans interface
+            services.AddScoped<IModuleService, ModuleService>(); // avec interface
+            services.AddScoped<ISubjectService, SubjectService>();
+
+            // -------------------------------------------------------
+            // 5️⃣ SESSION
             // -------------------------------------------------------
             services.AddDistributedMemoryCache();
             services.AddSession(options =>
@@ -82,7 +82,7 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 5️⃣ COOKIES AUTH
+            // 6️⃣ AUTHENTICATION (COOKIES)
             // -------------------------------------------------------
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
@@ -95,7 +95,7 @@ namespace SmartQuiz
                 });
 
             // -------------------------------------------------------
-            // 6️⃣ ROLES
+            // 7️⃣ AUTHORIZATION (ROLES)
             // -------------------------------------------------------
             services.AddAuthorization(options =>
             {
@@ -105,12 +105,12 @@ namespace SmartQuiz
             });
 
             // -------------------------------------------------------
-            // 7️⃣ HTTP CONTEXT ACCESSOR
+            // 8️⃣ CONTEXT ACCESSOR
             // -------------------------------------------------------
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             // -------------------------------------------------------
-            // 8️⃣ DATABASE INITIALIZER (IMPORTANT)
+            // 9️⃣ DATABASE INITIALIZER (SEED ADMIN)
             // -------------------------------------------------------
             services.AddScoped<DatabaseInitializer>();
         }
@@ -125,7 +125,7 @@ namespace SmartQuiz
                 app.UseHsts();
             }
 
-            // Seed initial admin user (synchronisé)
+            // Seed initial admin user
             dbInit.SeedAdminUser().Wait();
 
             app.UseHttpsRedirection();

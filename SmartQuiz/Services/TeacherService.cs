@@ -12,26 +12,20 @@ namespace SmartQuiz.Services
 
         public TeacherService(IConfiguration config)
         {
-            // Récupération CORRECTE des valeurs dans appsettings.json
             var connectionString = config["MongoDB:ConnectionString"];
             var databaseName = config["MongoDB:DatabaseName"];
 
-            if (string.IsNullOrEmpty(connectionString))
-                throw new Exception("❌ MongoDB connection string is missing in appsettings.json!");
-
-            if (string.IsNullOrEmpty(databaseName))
-                throw new Exception("❌ MongoDB database name is missing in appsettings.json!");
-
-            // Connexion à MongoDB
             var client = new MongoClient(connectionString);
             var db = client.GetDatabase(databaseName);
 
-            // Collections
             _quizCollection = db.GetCollection<Quiz>("Quizzes");
             _tpCollection = db.GetCollection<Tp>("Tps");
             _userCollection = db.GetCollection<User>("Users");
         }
 
+        // -----------------------------------------
+        // 🔹 COUNT — STRING IDs
+        // -----------------------------------------
         public int CountQuizzes(string teacherId)
         {
             return (int)_quizCollection.CountDocuments(q => q.CreatedBy == teacherId);
@@ -42,6 +36,9 @@ namespace SmartQuiz.Services
             return (int)_tpCollection.CountDocuments(tp => tp.teacherId == teacherId);
         }
 
+        // -----------------------------------------
+        // 🔹 GET LISTS
+        // -----------------------------------------
         public List<Quiz> GetMyQuizzes(string teacherId)
         {
             return _quizCollection.Find(q => q.CreatedBy == teacherId).ToList();
@@ -52,16 +49,15 @@ namespace SmartQuiz.Services
             return _tpCollection.Find(tp => tp.teacherId == teacherId).ToList();
         }
 
+        // -----------------------------------------
+        // 🔹 GET TEACHERS BY IDS (STRING)
+        // -----------------------------------------
         public async Task<List<User>> GetTeachersByIdsAsync(List<string> teacherIds)
         {
             if (teacherIds == null || teacherIds.Count == 0)
                 return new List<User>();
 
-            var objectIds = teacherIds
-                .Select(id => MongoDB.Bson.ObjectId.Parse(id))
-                .ToList();
-
-            var filter = Builders<User>.Filter.In(u => u.Id, objectIds);
+            var filter = Builders<User>.Filter.In(u => u.Id, teacherIds);
 
             return await _userCollection.Find(filter).ToListAsync();
         }
@@ -75,10 +71,8 @@ namespace SmartQuiz.Services
 
         public async Task<User> GetByIdAsync(string id)
         {
-            var objectId = MongoDB.Bson.ObjectId.Parse(id);
-
             return await _userCollection
-                .Find(u => u.Id == objectId && u.Role == "Teacher")
+                .Find(u => u.Id == id && u.Role == "Teacher")
                 .FirstOrDefaultAsync();
         }
     }

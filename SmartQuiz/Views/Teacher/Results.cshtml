@@ -1,63 +1,107 @@
-﻿@model SmartQuiz.Models.TeacherResultsViewModel
+﻿@model SmartQuiz.Models.TeacherResultsDashboardViewModel
+
 @{
-    ViewData["Title"] = "Mes Résultats";
-    Layout = "~/Views/Teacher/_Layout.cshtml";
+    ViewData["Title"] = "Statistiques des Résultats";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
 }
 
-<div class="container-fluid fade-up">
-    <h3 class="fw-bold mb-4">Résultats des étudiants</h3>
+<h2 class="mb-4">📊 Tableau de bord des résultats</h2>
 
-    <div class="card p-4 shadow-sm mb-4">
-        <h5 class="fw-bold mb-3">Statistiques globales</h5>
-
-        <div class="row text-center">
-            <div class="col-md-4">
-                <small class="text-muted">Étudiants évalués</small>
-                <div class="h4">@Model.TotalStudents</div>
-            </div>
-            <div class="col-md-4">
-                <small class="text-muted">Quizzes créés</small>
-                <div class="h4">@Model.TotalQuizzes</div>
-            </div>
-            <div class="col-md-4">
-                <small class="text-muted">Moyenne générale</small>
-                <div class="h4">@Model.AverageScore %</div>
-            </div>
+<div class="row text-center mb-4">
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Étudiants évalués</h5>
+            <h2>@Model.TotalEvaluatedStudents</h2>
         </div>
     </div>
 
-    <div class="card p-4 shadow-sm">
-        <h5 class="fw-bold mb-3">Détails des résultats</h5>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Moyenne Quiz</h5>
+            <h2>@Model.AverageQuiz.ToString("0.0")</h2>
+        </div>
+    </div>
 
-        <table class="table table-bordered align-middle">
-            <thead>
-                <tr>
-                    <th>Étudiant</th>
-                    <th>Quiz</th>
-                    <th>Note</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model.Results != null && Model.Results.Any())
-                {
-                    foreach (var r in Model.Results)
-                    {
-                        <tr>
-                            <td>@r.StudentName</td>
-                            <td>@r.QuizTitle</td>
-                            <td><span class="fw-bold text-primary">@r.Score %</span></td>
-                            <td>@r.DateTaken.ToShortDateString()</td>
-                        </tr>
-                    }
-                }
-                else
-                {
-                    <tr>
-                        <td colspan="4" class="text-center text-muted">Aucun résultat pour le moment.</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Moyenne Contrôle</h5>
+            <h2>@Model.AverageTest.ToString("0.0")</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card p-3 shadow-sm">
+            <h5>Progression Moyenne</h5>
+            <h2>@Model.AverageProgress.ToString("0.0")%</h2>
+        </div>
     </div>
 </div>
+
+<h4 class="mt-5">📘 Statistiques par matière</h4>
+
+<table class="table table-bordered mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>Matière</th>
+            <th>Moyenne Quiz</th>
+            <th>Moyenne Contrôle</th>
+            <th>Progression</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var g in Model.GroupStats)
+        {
+            <tr>
+                <td>@g.Subject</td>
+                <td>@g.AverageQuiz.ToString("0.0")</td>
+                <td>@g.AverageTest.ToString("0.0")</td>
+                <td>@g.AverageProgress.ToString("0.0")%</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4 class="mt-5">🏆 Top 5 des meilleurs étudiants</h4>
+
+<table class="table table-striped mt-3">
+    <thead class="table-dark">
+        <tr>
+            <th>ID Étudiant</th>
+            <th>Moyenne générale</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model.TopStudents)
+        {
+            <tr>
+                <td>@student.StudentId</td>
+                <td>@student.Average.ToString("0.0")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<h4 class="mt-5">📈 Graphique des moyennes</h4>
+<canvas id="statsChart"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    const ctx = document.getElementById('statsChart');
+
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Quiz', 'Contrôle', 'Progression'],
+            datasets: [{
+                label: 'Moyennes',
+                data: [
+                    @Model.AverageQuiz,
+                    @Model.AverageTest,
+                    @Model.AverageProgress
+                ],
+                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc']
+            }]
+        }
+    });
+</script>

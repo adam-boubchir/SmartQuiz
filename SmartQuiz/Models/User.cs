@@ -9,7 +9,8 @@ namespace SmartQuiz.Models
     public class User
     {
         [BsonId]
-        public ObjectId Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
+        public String Id { get; set; }
 
         [BsonElement("email")]
         public string Email { get; set; } = string.Empty;
