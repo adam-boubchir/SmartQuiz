@@ -1,10 +1,10 @@
 ﻿using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using YourProject.Models;
+using SmartQuiz.Models;
 using System;
 
-namespace YourProject.Services
+namespace SmartQuiz.Services
 {
     public class QuizService : IQuizService
     {
@@ -72,7 +72,52 @@ namespace YourProject.Services
         {
             return await _collection.Find(_ => true).ToListAsync();
         }
-    
+
+        public async Task<List<Quiz>> DebugGetAll()
+        {
+            return await _collection.Find(_ => true).ToListAsync();
+        }
+        public async Task<List<Quiz>> GetForStudentAsync(string groupId)
+        {
+            var builder = Builders<Quiz>.Filter;
+
+            // Quiz pour tous les groupes OU pour le groupe de l’étudiant
+            var filter = builder.Or(
+                builder.Eq(q => q.GroupId, null),
+                builder.Eq(q => q.GroupId, groupId)
+            );
+
+            return await _collection
+                .Find(filter)
+                .SortByDescending(q => q.CreatedAt)
+                .ToListAsync();
+        }
+        public async Task MigrateDatesFromDescription()
+        {
+            var quizzes = await _collection.Find(q =>
+                q.StartDate == null && q.Description.Contains("Ouverture")
+            ).ToListAsync();
+
+            foreach (var quiz in quizzes)
+            {
+                try
+                {
+                    var parts = quiz.Description.Split("—");
+                    var start = parts[0].Replace("Ouverture :", "").Trim();
+                    var end = parts[1].Replace("Fermeture :", "").Trim();
+
+                    quiz.StartDate = DateTime.Parse(start);
+                    quiz.EndDate = DateTime.Parse(end);
+
+                    await _collection.ReplaceOneAsync(q => q.Id == quiz.Id, quiz);
+                }
+                catch { /* ignore */ }
+            }
+        }
+
+
+
+
     }
 
 }

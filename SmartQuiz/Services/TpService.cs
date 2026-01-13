@@ -2,8 +2,6 @@
 using SmartQuiz.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using YourProject.Models;
-using YourProject.Services;
 using System;
 
 namespace SmartQuiz.Services

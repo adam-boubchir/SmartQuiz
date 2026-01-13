@@ -4,7 +4,7 @@ using SmartQuiz.Models;
 using SmartQuiz.Services;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using YourProject.Services;
+
 
 namespace SmartQuiz.Controllers
 {
@@ -50,7 +50,7 @@ namespace SmartQuiz.Controllers
             if (student == null)
                 return Unauthorized();
 
-            var quizzes = await _quizService.GetByTeachersAsync(student.TeacherIds);
+            var quizzes = await _quizService.GetForStudentAsync(student.GroupId);
             var tps = await _tpService.GetByTeachersAsync(student.TeacherIds);
 
             ViewBag.Quizzes = quizzes;
@@ -70,7 +70,10 @@ namespace SmartQuiz.Controllers
             if (student == null)
                 return Unauthorized();
 
-            var quizzes = await _quizService.GetByTeachersAsync(student.TeacherIds);
+            var quizzes = await _quizService.GetForStudentAsync(student.GroupId);
+
+
+
             var tps = await _tpService.GetByTeachersAsync(student.TeacherIds);
 
             ViewBag.QuizzesCount = quizzes.Count;
@@ -91,6 +94,17 @@ namespace SmartQuiz.Controllers
 
             if (quiz == null)
                 return NotFound();
+            var now = DateTime.UtcNow;
+
+            if (quiz.StartDate == null || quiz.EndDate == null)
+                return Forbid();
+
+            if (now < quiz.StartDate)
+                return Forbid();
+
+            if (now > quiz.EndDate)
+                return Forbid();
+
 
             return View(quiz);
         }
@@ -178,10 +192,14 @@ namespace SmartQuiz.Controllers
         public async Task<IActionResult> Quizzes()
         {
             var student = await _userService.GetByIdAsync(GetUserId());
-            var quizzes = await _quizService.GetByTeachersAsync(student.TeacherIds);
+            if (student == null)
+                return Unauthorized();
+
+            var quizzes = await _quizService.GetForStudentAsync(student.GroupId);
 
             return View(quizzes);
         }
+
 
         // ======================================
         //  LISTE DE TOUS LES TP

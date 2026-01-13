@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using YourProject.Models;
+using SmartQuiz.Models;
 
-namespace YourProject.Services
+namespace SmartQuiz.Services
 {
     public interface ITpService
     {

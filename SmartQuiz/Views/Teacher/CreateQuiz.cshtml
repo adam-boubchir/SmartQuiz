@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Créer un Quiz";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<div class="container mt-5">
+
+    <h2 class="text-center mb-4">Créer un nouveau Quiz</h2>
+
+    <div class="row justify-content-center">
+
+        <!-- Option Manuelle -->
+        <div class="col-md-5">
+            <div class="card shadow p-4 text-center">
+                <h4>📝 Création manuelle</h4>
+                <p>Créer un quiz question par question.</p>
+                <a href="/Teacher/CreateQuizManual" class="btn btn-primary w-100">
+                    Continuer
+                </a>
+            </div>
+        </div>
+
+        <!-- Option IA -->
+        <div class="col-md-5">
+            <div class="card shadow p-4 text-center">
+                <h4>🤖 Génération via IA</h4>
+                <p>Laisser l'IA générer automatiquement les questions.</p>
+                <a href="/Teacher/CreateQuizAI" class="btn btn-dark w-100">
+                    Continuer
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>

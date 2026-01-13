@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using YourProject.Services;
+
 
 namespace SmartQuiz.Services
 {
@@ -73,8 +73,8 @@ namespace SmartQuiz.Services
             }
 
             // stats: count quizzes/tps assigned to this student via teachers
-            var quizzes = (teacherIds.Any() && _quizService != null) ? await _quizService.GetByTeachersAsync(teacherIds) : new List<YourProject.Models.Quiz>();
-            var tps = (teacherIds.Any() && _tpService != null) ? await _tpService.GetByTeachersAsync(teacherIds) : new List<YourProject.Models.Tp>();
+            var quizzes = (teacherIds.Any() && _quizService != null) ? await _quizService.GetByTeachersAsync(teacherIds) : new List<SmartQuiz.Models.Quiz>();
+            var tps = (teacherIds.Any() && _tpService != null) ? await _tpService.GetByTeachersAsync(teacherIds) : new List<SmartQuiz.Models.Tp>();
 
             var vm = new StudentProfileViewModel
             {

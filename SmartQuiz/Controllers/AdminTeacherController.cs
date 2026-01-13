@@ -4,8 +4,6 @@ using SmartQuiz.Services;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using YourProject.Services;
-using YourProject.Models;
 
 namespace SmartQuiz.Controllers
 {

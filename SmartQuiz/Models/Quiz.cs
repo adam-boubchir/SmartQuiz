@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using System;
 using System.Collections.Generic;
 
-namespace YourProject.Models
+namespace SmartQuiz.Models
 {
     [BsonIgnoreExtraElements]
     public class Quiz
@@ -15,7 +15,6 @@ namespace YourProject.Models
         public string Title { get; set; }
         public string Description { get; set; }
 
-        [BsonRepresentation(BsonType.ObjectId)]
         public string CreatedBy { get; set; } // teacherId
 
         [BsonRepresentation(BsonType.ObjectId)]
@@ -23,11 +22,34 @@ namespace YourProject.Models
 
         [BsonElement("subjectName")]
         public string SubjectName { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
 
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public List<Question> Questions { get; set; } = new List<Question>();
+        [BsonIgnore]
+        public string Status
+        {
+            get
+            {
+                var now = DateTime.UtcNow;
+
+                if (StartDate == null || EndDate == null)
+                    return "unknown";
+
+                if (now < StartDate)
+                    return "pending";
+
+                if (now > EndDate)
+                    return "closed";
+
+                return "open";
+            }
+        }
+
     }
 
     public class Question

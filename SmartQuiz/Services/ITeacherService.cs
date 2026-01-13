@@ -1,5 +1,4 @@
 ﻿using SmartQuiz.Models;
-using YourProject.Models;
 
 namespace SmartQuiz.Services
 {

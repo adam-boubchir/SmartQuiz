@@ -321,3 +321,16 @@ body {
         height: 40px;
     }
 }
+/* 🔧 FIX FINAL AFFICHAGE QUIZZES */
+.main {
+    display: block !important;
+    opacity: 1 !important;
+    overflow: visible !important;
+    height: auto !important;
+}
+
+.fade-up {
+    opacity: 1 !important;
+    transform: none !important;
+}
+

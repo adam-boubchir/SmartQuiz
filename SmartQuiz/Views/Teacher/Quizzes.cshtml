@@ -1,4 +1,5 @@
-﻿@model IEnumerable<YourProject.Models.Quiz>
+﻿@model IEnumerable<SmartQuiz.Models.Quiz>
+
 @{
     ViewData["Title"] = "Mes Quizzes";
     Layout = "~/Views/Shared/_TeacherLayout.cshtml";
@@ -6,18 +7,29 @@
 
 <div class="card shadow-sm fade-up">
     <div class="card-header d-flex justify-content-between align-items-center bg-white">
-        <h5 class="m-0 fw-semibold"><i class="fa fa-list me-2 text-primary"></i>Mes Quizzes</h5>
+        <h5 class="m-0 fw-semibold">
+            <i class="fa fa-list me-2 text-primary"></i> Mes Quizzes
+        </h5>
         <div>
-            <a class="btn btn-outline-secondary btn-sm me-2" href="/Teacher/ImportQuizzes"><i class="fa fa-file-import me-1"></i>Importer</a>
-            <a class="btn btn-primary btn-sm" href="/Teacher/CreateQuiz"><i class="fa fa-plus me-1"></i>Nouveau Quiz</a>
+            <a class="btn btn-primary btn-sm" href="/Teacher/CreateQuiz">
+                <i class="fa fa-plus me-1"></i> Nouveau Quiz
+            </a>
         </div>
     </div>
 
     <div class="table-responsive">
-        <table class="table table-hover mb-0">
+        <table class="table table-hover mb-0 align-middle">
             <thead class="table-light">
-                <tr><th>Titre</th><th>Questions</th><th>Groupe</th><th>Date</th><th class="text-end">Actions</th></tr>
+                <tr>
+                    <th>Titre</th>
+                    <th>Type</th>
+                    <th>Questions</th>
+                    <th>Groupe</th>
+                    <th>Date</th>
+                    <th class="text-end">Actions</th>
+                </tr>
             </thead>
+
             <tbody>
                 @if (Model != null && Model.Any())
                 {
@@ -25,34 +37,80 @@
                     {
                         <tr>
                             <td class="fw-medium">@q.Title</td>
-                            <td>@(q.Questions?.Count ?? 0)</td>
-                            <td>@(q.GroupId ?? "-")</td>
-                            <td>@q.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</td>
-                            <td class="text-end">
-                                <a class="btn btn-sm btn-outline-primary me-1" href="/Teacher/EditQuiz/@q.Id"><i class="fa fa-pen"></i></a>
-                                <a class="btn btn-sm btn-outline-danger" href="/Teacher/DeleteQuiz/@q.Id"><i class="fa fa-trash"></i></a>
+
+                            <td>
+                                @if (q.SubjectName == "Quiz IA")
+                                {
+                                    <span class="badge bg-primary">🤖 IA</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">📝 Manuel</span>
+                                }
                             </td>
+
+                            <td>@(q.Questions?.Count ?? 0)</td>
+
+                            <td>
+                                @(string.IsNullOrEmpty(q.GroupId) ? "Tous" : q.GroupId)
+                            </td>
+
+                            <td>@q.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd")</td>
+
+                            <td class="text-end">
+                                <a class="btn btn-sm btn-outline-primary me-1"
+                                   href="/Teacher/EditQuiz/@q.Id"
+                                   title="Éditer">
+                                    <i class="fa fa-pen"></i>
+                                </a>
+
+                                <button class="btn btn-sm btn-outline-danger"
+                                        onclick="deleteQuiz('@q.Id')"
+                                        title="Supprimer">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </td>
+
                         </tr>
                     }
                 }
                 else
                 {
-                    <tr><td colspan="5" class="text-center py-4 text-muted">Aucun quiz créé.</td></tr>
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            Aucun quiz créé.
+                        </td>
+                    </tr>
                 }
             </tbody>
         </table>
     </div>
-
-    <div class="card-footer text-muted d-flex justify-content-between align-items-center">
-        <small>Liste des quizzes créés</small>
-        <nav aria-label="Pagination">
-            <!-- placeholder pagination -->
-            <ul class="pagination pagination-sm mb-0">
-                <li class="page-item disabled"><a class="page-link">Préc.</a></li>
-                <li class="page-item active"><a class="page-link">1</a></li>
-                <li class="page-item"><a class="page-link">2</a></li>
-                <li class="page-item"><a class="page-link">Suiv.</a></li>
-            </ul>
-        </nav>
-    </div>
 </div>
+
+@section Scripts {
+    <script>
+        async function deleteQuiz(id) {
+            if (!confirm("⚠️ Voulez-vous vraiment supprimer ce quiz ?")) return;
+
+            const response = await fetch("/Teacher/DeleteQuiz", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "id=" + encodeURIComponent(id)
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                alert("✅ Quiz supprimé");
+                location.reload();
+            } else {
+                alert(result.message || "Erreur lors de la suppression");
+            }
+        }
+    </script>
+}
+
+
+

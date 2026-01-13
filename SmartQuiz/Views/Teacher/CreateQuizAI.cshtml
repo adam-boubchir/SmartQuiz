@@ -1,0 +1,146 @@
+﻿@{
+    ViewData["Title"] = "Créer un Quiz via IA";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<h2 class="mb-4">Création du Quiz via IA</h2>
+
+<form id="aiQuizForm">
+
+    <div class="mb-3">
+        <label>Sujet du Quiz</label>
+        <input class="form-control" id="aiTopic" placeholder="Ex: Les bases du C#, L’HTML, Les animaux…" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Nombre de questions</label>
+        <input type="number" id="aiCount" class="form-control" min="1" max="20" value="5" required />
+    </div>
+
+    <div class="mb-3">
+        <label>Type de réponses</label>
+        <select id="aiType" class="form-select">
+            <option value="text">Réponse texte</option>
+            <option value="mcq">Choix multiple</option>
+        </select>
+    </div>
+
+    <button type="button" class="btn btn-dark w-100" id="generateAI">
+        🚀 Générer avec IA
+    </button>
+
+    <div id="aiResult" class="mt-4" style="display:none;">
+        <h4>Quiz généré</h4>
+        <div id="aiPreview" class="border p-3 rounded bg-light"></div>
+
+        <button type="button" class="btn btn-success w-100 mt-3" id="approveAI">
+            ✔ Approuver & Enregistrer
+        </button>
+
+    </div>
+
+</form>
+
+@section Scripts {
+
+    <script>
+        document.getElementById("aiQuizForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+        });
+
+
+        document.getElementById("generateAI").addEventListener("click", async () => {
+            console.log("📌 Script AI chargé ✔");
+
+            console.log("➡️ Envoi requête IA...");
+
+            let payload = {
+                topic: document.getElementById("aiTopic").value,
+                count: parseInt(document.getElementById("aiCount").value),
+                multipleChoice: document.getElementById("aiType").value === "mcq"
+            };
+
+            let response = await fetch("/api/quiz/ai", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                alert("Erreur serveur IA !");
+                console.error(await response.text());
+                return;
+            }
+
+            let quiz = await response.json();
+            window.generatedQuiz = quiz;
+
+            console.log("📌 Quiz IA reçu :", quiz);
+
+            // -------- AFFICHAGE ----------
+            let preview = "";
+            quiz.questions.forEach((q, i) => {
+                preview += `<b>${i + 1}. ${q.text}</b><br/>`;
+
+                if (q.options?.length > 0) {
+                    q.options.forEach((opt, idx) => {
+                        preview += `- ${opt} ${idx === q.correctIndex ? "✔️" : ""}<br/>`;
+                    });
+                }
+
+                preview += "<br/>";
+            });
+
+            document.getElementById("aiPreview").innerHTML = preview;
+            document.getElementById("aiResult").style.display = "block";
+        });
+
+        // -------- SAUVEGARDE EN BDD ------------
+            document.getElementById("approveAI").addEventListener("click", async (e) => {
+            e.preventDefault();
+
+            console.log("💾 Tentative sauvegarde quiz IA");
+
+            if (!window.generatedQuiz || !window.generatedQuiz.questions?.length) {
+                alert("Aucun quiz généré !");
+                return;
+            }
+
+            let quizToSave = {
+                Title: window.generatedQuiz.title,
+                Questions: window.generatedQuiz.questions
+            };
+
+            console.log("📤 quizToSave =", quizToSave);
+
+            let response = await fetch("/Teacher/SaveAIQuiz", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(quizToSave)
+            });
+            if (!response.ok) {
+                console.error("Erreur HTTP", response.status);
+                alert("Erreur serveur lors de la sauvegarde");
+            return;
+            }
+
+
+            let result = await response.json();
+
+            console.log("📥 Réponse serveur =", result);
+
+           if (result.success) {
+                console.log("➡️ Redirection vers configuration, quizId =", result.quizId);
+
+                window.location.href =
+                    "/Teacher/ConfigureQuiz?id=" + result.quizId;
+           } else {
+            alert(result.message || "Erreur lors de la sauvegarde !");
+            }
+
+        });
+
+
+    </script>
+}
+

@@ -7,7 +7,6 @@ using System.Text;
 
 using System.Linq;
 using System.Threading.Tasks;
-using YourProject.Models;
 
 namespace SmartQuiz.Controllers
 {

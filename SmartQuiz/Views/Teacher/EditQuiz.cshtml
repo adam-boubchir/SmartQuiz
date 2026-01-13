@@ -1,0 +1,40 @@
+﻿@model SmartQuiz.Models.Quiz
+
+@{
+    ViewData["Title"] = "Modifier le Quiz";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<div class="card shadow-sm">
+    <div class="card-header bg-white">
+        <h5 class="m-0 fw-semibold">✏️ Modifier le Quiz</h5>
+    </div>
+
+    <div class="card-body">
+        <form asp-action="EditQuiz" method="post">
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="mb-3">
+                <label class="form-label">Titre</label>
+                <input asp-for="Title" class="form-control" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                <textarea asp-for="Description" class="form-control"></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="/Teacher/Quizzes" class="btn btn-secondary">
+                    Annuler
+                </a>
+
+                <button type="submit" class="btn btn-success">
+                    💾 Enregistrer
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

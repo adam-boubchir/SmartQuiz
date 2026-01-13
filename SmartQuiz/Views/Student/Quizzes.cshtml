@@ -1,4 +1,5 @@
-﻿@{
+﻿@model IEnumerable<SmartQuiz.Models.Quiz>
+@{
     ViewData["Title"] = "Tous les Quizzes";
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
 }
@@ -9,8 +10,9 @@
     <thead class="table-light">
         <tr>
             <th>Titre</th>
+            <th>type</th>
             <th>Description</th>
-            <th></th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -18,9 +20,31 @@
         {
             <tr>
                 <td>@quiz.Title</td>
+                <td>
+                    @(quiz.SubjectName == "Quiz IA" ? "🤖 IA" : "✍️ Manuel")
+                </td>
                 <td>@quiz.Description</td>
                 <td>
-                    <a href="/Student/QuizDetail/@quiz.Id" class="btn btn-primary btn-sm">Commencer</a>
+                    @if (quiz.StartDate == null || quiz.EndDate == null)
+                    {
+                        <span class="badge bg-secondary">❓ Non configuré</span>
+                    }
+                    else if (DateTime.UtcNow < quiz.StartDate)
+                    {
+                        <span class="badge bg-warning">⏳ En attente</span>
+                    }
+                    else if (DateTime.UtcNow > quiz.EndDate)
+                    {
+                        <span class="badge bg-dark">🔒 Fermé</span>
+                    }
+                    else
+                    {
+                        <a href="/Student/QuizDetail/@quiz.Id"
+                           class="btn btn-primary btn-sm">
+                            ▶️ Commencer
+                        </a>
+                    }
+
                 </td>
             </tr>
         }

@@ -1,0 +1,33 @@
+﻿@model SmartQuiz.Models.Quiz
+
+@{
+    ViewData["Title"] = "Aperçu du Quiz";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<h2 class="mb-3">@Model.Title</h2>
+
+<div class="card p-3">
+
+    @foreach (var q in Model.Questions.Select((val, index) => new { val, index }))
+    {
+        <div class="border p-3 mb-2 rounded">
+            <b>Question @(q.index + 1) :</b> @q.val.Text
+            <br />
+
+            @if (q.val.Options.Count > 0)
+            {
+                <ul>
+                    @foreach (var op in q.val.Options)
+                    {
+                        <li>@op</li>
+                    }
+                </ul>
+            }
+        </div>
+    }
+
+    <a href="/Teacher/ConfigureQuiz?id=@Model.Id" class="btn btn-primary mt-3">
+        Continuer vers la configuration
+    </a>
+</div>

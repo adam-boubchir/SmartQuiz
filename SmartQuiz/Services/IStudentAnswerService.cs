@@ -1,7 +1,6 @@
 ﻿using SmartQuiz.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using YourProject.Models;
 
 namespace SmartQuiz.Services
 {

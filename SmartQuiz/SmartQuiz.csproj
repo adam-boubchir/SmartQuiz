@@ -7,16 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Views\Student\CodeFile.cs" />
-    <Compile Remove="Views\Student\Interface.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Views\Student\Index1.cshtml" />
-    <Content Remove="Views\Student\QuizDetail.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1" />

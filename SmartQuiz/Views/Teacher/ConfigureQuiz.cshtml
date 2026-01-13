@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Configuration du Quiz";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<h2 class="mb-4">Configuration du Quiz</h2>
+
+<div class="card p-4 shadow-sm">
+
+    <h4 class="mb-3">Paramètres du Quiz</h4>
+
+    <input type="hidden" id="quizId" value="@ViewBag.QuizId" />
+
+    <!-- ------------------------------ CHOIX DES GROUPES ------------------------------ -->
+    <div class="mb-4">
+        <label class="fw-bold">Groupe cible :</label>
+
+        <select id="selectedGroup" class="form-select">
+            <option value="all">📌 Tous les groupes</option>
+
+            @foreach (var g in ViewBag.Groups)
+            {
+                <option value="@g.Id">@g.Name</option>
+            }
+        </select>
+    </div>
+
+    <!-- ------------------------------ DATES ------------------------------ -->
+    <div class="row">
+
+        <div class="col-md-6 mb-3">
+            <label class="fw-bold">Ouverture :</label>
+            <input type="datetime-local" id="startDate" class="form-control" required />
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <label class="fw-bold">Fermeture :</label>
+            <input type="datetime-local" id="endDate" class="form-control" required />
+        </div>
+
+    </div>
+
+    <!-- ------------------------------ BOUTON PUBLIER ------------------------------ -->
+
+    <button id="publishQuiz" class="btn btn-primary w-100 mt-4">
+        🚀 Publier le Quiz
+    </button>
+
+
+</div>
+
+@section Scripts {
+    <script>
+
+        document.getElementById("publishQuiz").addEventListener("click", async () => {
+
+            const quizId = document.getElementById("quizId").value;
+            const groupId = document.getElementById("selectedGroup").value;
+            const startDate = document.getElementById("startDate").value;
+            const endDate = document.getElementById("endDate").value;
+
+            if (!quizId) return alert("ID quiz manquant !");
+            if (!startDate || !endDate) return alert("Dates requises !");
+
+            const payload = { quizId, groupId, startDate, endDate };
+
+            let res = await fetch("/Teacher/PublishQuiz", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            let result = await res.json();
+
+            if (result.success) {
+                alert("Quiz publié !");
+                window.location.href = "/Teacher/Quizzes";
+            } else {
+                alert(result.message);
+            }
+        });
+
+    </script>
+}

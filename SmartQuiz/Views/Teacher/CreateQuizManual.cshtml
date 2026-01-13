@@ -1,0 +1,130 @@
+﻿@{
+    ViewData["Title"] = "Créer un quiz manuellement";
+    Layout = "~/Views/Shared/_TeacherLayout.cshtml";
+}
+
+<h2 class="mb-3">Créer un Quiz Manuellement</h2>
+
+<div class="card p-4 shadow-sm">
+
+    <label><b>Titre du quiz</b></label>
+    <input class="form-control mb-4" id="quizTitle" placeholder="Ex : Introduction au C#" />
+
+    <div id="questionsContainer"></div>
+
+    <button class="btn btn-secondary mt-3" id="addQuestion">➕ Ajouter une question</button>
+
+    <button class="btn btn-warning w-100 mt-4" id="previewBtn">📘 Aperçu</button>
+</div>
+
+@section Scripts {
+    <script>
+
+        let questionCount = 0;
+
+        // ------------ Ajouter question par défaut (5 min) -----------
+        for (let i = 0; i < 5; i++) addQuestion();
+
+        // ------------------ Ajouter une question --------------------
+        document.getElementById("addQuestion").addEventListener("click", () => addQuestion());
+
+        function addQuestion() {
+            questionCount++;
+
+            let container = document.getElementById("questionsContainer");
+
+            let html = `
+                <div class="border p-3 mt-3 rounded" id="q${questionCount}">
+                    <h5>Question ${questionCount}</h5>
+
+                    <label>Texte de la question :</label>
+                    <input class="form-control mb-2 questionText" />
+
+                    <label>Type :</label>
+                    <select class="form-select mb-2 questionType" onchange="changeType(${questionCount})">
+                        <option value="mcq">Choix multiple</option>
+                        <option value="text">Réponse texte</option>
+                    </select>
+
+                    <div class="optionsContainer">
+                        ${createMCQOptions(questionCount)}
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML("beforeend", html);
+        }
+
+        function createMCQOptions(id) {
+            return `
+                <label>Choix :</label>
+                <input class="form-control mb-1 opt${id}" placeholder="Option 1" />
+                <input class="form-control mb-1 opt${id}" placeholder="Option 2" />
+                <input class="form-control mb-1 opt${id}" placeholder="Option 3" />
+                <input class="form-control mb-1 opt${id}" placeholder="Option 4" />
+                <label class="mt-2">Bonne réponse :</label>
+                <input type="number" min="1" max="4" class="form-control correct${id}" />
+            `;
+        }
+
+        // ------------------ Change type (MCQ <-> Texte) -------------
+        function changeType(id) {
+            let div = document.querySelector(`#q${id} .optionsContainer`);
+            let type = document.querySelector(`#q${id} .questionType`).value;
+
+            if (type === "mcq") {
+                div.innerHTML = createMCQOptions(id);
+            } else {
+                div.innerHTML = `
+                    <label>Réponse attendue :</label>
+                    <input class="form-control textAnswer${id}" />
+                `;
+            }
+        }
+
+        // ------------------ Aperçu avant publication ----------------
+        document.getElementById("previewBtn").addEventListener("click", async () => {
+            let quiz = {
+                title: document.getElementById("quizTitle").value,
+                subjectName: "Manuel",
+                groupId: null,
+                questions: []
+            };
+
+
+            for (let i = 1; i <= questionCount; i++) {
+                let text = document.querySelector(`#q${i} .questionText`)?.value;
+                let type = document.querySelector(`#q${i} .questionType`)?.value;
+
+                if (!text) continue;
+
+                let question = { text: text, options: [], correctIndex: 0 };
+
+                if (type === "mcq") {
+                    let opts = [...document.querySelectorAll(`.opt${i}`)].map(o => o.value);
+                    let correct = document.querySelector(`.correct${i}`).value - 1;
+
+                    question.options = opts;
+                    question.correctIndex = correct;
+                }
+
+                quiz.questions.push(question);
+            }
+
+            let res = await fetch("/Teacher/SaveManualQuiz", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(quiz)
+            });
+
+            let result = await res.json();
+
+            if (result.success) {
+                window.location.href = "/Teacher/PreviewQuiz?id=" + result.quizId;
+            } else {
+                alert(result.message);
+            }
+        });
+
+    </script>
+}
