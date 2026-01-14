@@ -1,0 +1,97 @@
+﻿@model List<SmartQuiz.Models.ChatConversation>
+
+@{
+    ViewData["Title"] = "Assistant IA";
+
+    Layout =
+        User.IsInRole("Student") ? "_StudentLayout" :
+        User.IsInRole("Teacher") ? "_TeacherLayout" :
+        "_AdminLayout";
+}
+
+<style>
+    .chat-page {
+        display: flex;
+        height: calc(100vh - 80px);
+    }
+
+    .chat-sidebar {
+        width: 280px;
+        border-right: 1px solid #ddd;
+        padding: 10px;
+        overflow-y: auto;
+    }
+
+    .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #chat-messages {
+        flex: 1;
+        padding: 15px;
+        overflow-y: auto;
+    }
+
+    .chat-item.active {
+        background-color: #4f46e5;
+        color: white;
+    }
+
+    .chat-item:hover {
+        background-color: #eef2ff;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="row" style="height: calc(100vh - 100px);">
+
+        <!-- 🟦 HISTORIQUE À GAUCHE -->
+        <div class="col-md-3 border-end d-flex flex-column">
+            <form asp-action="CreateConversation" method="post" class="p-2">
+                <button type="submit" class="btn btn-primary w-100">
+                    ➕ Nouvelle discussion
+                </button>
+            </form>
+
+            <ul class="list-group list-group-flush flex-grow-1 overflow-auto">
+                @foreach (var conv in Model)
+                {
+                    <li class="list-group-item chat-item"
+                        data-id="@conv.Id"
+                        style="cursor:pointer;">
+
+                        <strong>@conv.Title</strong><br />
+                        <small class="text-muted">
+                            @conv.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                        </small>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <!-- 💬 ZONE DE CHAT -->
+        <div class="col-md-9 d-flex flex-column">
+
+            <div id="chat-messages" class="flex-grow-1 p-3 overflow-auto bg-light">
+                <div class="text-muted text-center mt-5">
+                    👉 Sélectionne une discussion à gauche
+                </div>
+            </div>
+
+            <div class="border-top p-3 d-flex">
+                <input type="text"
+                       id="chat-input"
+                       class="form-control me-2"
+                       placeholder="Écris ton message..." />
+                <button id="send-btn" class="btn btn-success">
+                    Envoyer
+                </button>
+            </div>
+        </div>
+    </div>
+    <input type="hidden" id="current-conversation-id" />
+
+</div>

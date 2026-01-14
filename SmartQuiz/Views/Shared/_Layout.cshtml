@@ -58,8 +58,128 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+
+        #chatbot-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #4f46e5;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.25);
+            z-index: 9999;
+            transition: transform 0.2s ease;
+        }
+
+            #chatbot-button:hover {
+                transform: scale(1.1);
+            }
+
+        #chatbot-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 320px;
+            height: 420px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            display: flex;
+            flex-direction: column;
+            z-index: 9999;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .chat-header {
+            background: #4f46e5;
+            color: white;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+
+        .chat-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #f3f4f6;
+        }
+
+        .bot-message {
+            background: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            max-width: 80%;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 8px;
+            border-top: 1px solid #ddd;
+        }
+
+            .chat-input input {
+                flex: 1;
+                padding: 8px;
+                border-radius: 6px;
+                border: 1px solid #ccc;
+            }
+
+            .chat-input button {
+                margin-left: 6px;
+                background: #4f46e5;
+                color: white;
+                border: none;
+                padding: 0 14px;
+                border-radius: 6px;
+                cursor: pointer;
+            }
+
     </style>
 </head>
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- Chatbot Button -->
+    <div id="chatbot-button">
+        🤖
+    </div>
+
+    <!-- Chatbot Window -->
+    <div id="chatbot-window" class="hidden">
+        <div class="chat-header">
+            <span>SmartQuiz Assistant</span>
+            <button id="close-chat">✖</button>
+        </div>
+
+        <div class="chat-body">
+            <div class="bot-message">
+                👋 Bonjour ! Je suis là pour t’aider.
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" placeholder="Écris ton message..." />
+            <button>➤</button>
+        </div>
+    </div>
+}
+
+
+
 
 <body>
 

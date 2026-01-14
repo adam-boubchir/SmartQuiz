@@ -17,7 +17,8 @@ namespace SmartQuiz.Controllers
         private readonly IUserService _userService;
         private readonly ITeacherService _teacherService;
         private readonly IStudentProfileService _studentProfileService;
-      
+        private readonly IGroupService _groupService;
+
         public StudentController(
             IQuizService quizService,
             ITpService tpService,
@@ -115,11 +116,19 @@ namespace SmartQuiz.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitQuiz(StudentAnswer answer)
         {
+            if (answer == null || answer.Answers == null)
+                return BadRequest();
+
             answer.StudentId = GetUserId();
+            answer.SubmittedAt = DateTime.UtcNow;
+
             await _studentAnswerService.SaveAnswerAsync(answer);
 
             return RedirectToAction("MyResults");
         }
+
+
+
 
         // ======================================
         //  PROFIL ÉTUDIANT
@@ -218,9 +227,46 @@ namespace SmartQuiz.Controllers
         public async Task<IActionResult> MyResults()
         {
             var studentId = GetUserId();
+
+            var student = await _userService.GetByIdAsync(studentId);
+            if (student == null)
+                return Unauthorized();
+
             var answers = await _studentAnswerService.GetByStudentAsync(studentId);
 
-            return View(answers);
+            var results = new List<StudentResultViewModel>();
+
+            foreach (var a in answers)
+            {
+                var quiz = await _quizService.GetByIdAsync(a.QuizId);
+                if (quiz == null) continue;
+
+                var groupName = "—";
+                if (!string.IsNullOrEmpty(student.GroupId))
+                {
+                    var group = await _groupService.GetByIdAsync(student.GroupId);
+                    if (group != null)
+                        groupName = group.Name;
+                }
+
+                results.Add(new StudentResultViewModel
+                {
+                    StudentId = student.Id,
+                    StudentName = student.Username,
+                    GroupName = groupName,
+
+                    QuizId = quiz.Id,
+                    QuizTitle = quiz.Title,
+
+                    Score = a.Score,
+                    SubmittedAt = a.SubmittedAt
+                });
+            }
+
+            return View(results);
         }
+
+
+
     }
 }

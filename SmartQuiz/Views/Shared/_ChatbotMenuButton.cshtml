@@ -1,0 +1,10 @@
+﻿@if (User?.Identity?.IsAuthenticated == true)
+{
+    <li class="nav-item">
+        <a class="nav-link d-flex align-items-center gap-2"
+           href="/Chatbot">
+            <i class="fa fa-robot"></i>
+            <span>Assistant IA</span>
+        </a>
+    </li>
+}

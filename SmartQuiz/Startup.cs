@@ -60,9 +60,14 @@ namespace SmartQuiz
             // -------------------------------------------------------
             services.AddScoped<IOllamaService, OllamaService>();
             services.AddScoped<IQuizAIService, QuizAIService>();
+            services.AddScoped<IChatbotAIService, ChatbotAIService>();
+
+            // 💬 CHAT IA - HISTORIQUE
+            services.AddScoped<IChatConversationService, ChatConversationService>();
 
             // ⭐⭐⭐ AUTO-START OLLAMA
             services.AddHostedService<OllamaBackgroundService>();
+
 
             // -------------------------------------------------------
             // 4️⃣ CHAT (SignalR)

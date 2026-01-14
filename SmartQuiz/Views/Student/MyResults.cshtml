@@ -1,25 +1,30 @@
-﻿@{
+﻿@model IEnumerable<SmartQuiz.Models.StudentResultViewModel>
+
+@{
     ViewData["Title"] = "Mes Résultats";
     Layout = "~/Views/Shared/_StudentLayout.cshtml";
 }
 
-<h3>📊 Mes Résultats</h3>
-
-<table class="table table-striped mt-3">
+<h3 class="mb-4">📊 Mes Résultats</h3>
+<table class="table">
     <thead>
         <tr>
+            <th>Étudiant</th>
+            <th>Groupe</th>
             <th>Quiz</th>
-            <th>Date</th>
             <th>Score</th>
+            <th>Date</th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var result in Model)
+        @foreach (var r in Model)
         {
             <tr>
-                <td>@result.QuizTitle</td>
-                <td>@result.CreatedAt.ToLocalTime().ToString("yyyy-MM-dd HH:mm")</td>
-                <td>@result.Score / @result.Total</td>
+                <td>@r.StudentName</td>
+                <td>@r.GroupName</td>
+                <td>@r.QuizTitle</td>
+                <td>@r.Score</td>
+                <td>@r.SubmittedAt.ToLocalTime()</td>
             </tr>
         }
     </tbody>
