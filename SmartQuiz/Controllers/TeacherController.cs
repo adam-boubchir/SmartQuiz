@@ -369,12 +369,14 @@ namespace SmartQuiz.Controllers
             if (quiz == null)
                 return NotFound();
 
-            // 🔒 sécurité : seul le prof créateur
             if (quiz.CreatedBy != teacherId)
                 return Forbid();
 
+            ViewBag.Groups = await _groupService.GetByTeacherAsync(teacherId);
+
             return View(quiz);
         }
+
         // -----------------------------------------------------------
         //  MODIFIER UN QUIZ (POST)
         // -----------------------------------------------------------
@@ -384,26 +386,26 @@ namespace SmartQuiz.Controllers
         {
             var teacherId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            if (model == null || string.IsNullOrEmpty(model.Id))
-                return BadRequest();
-
             var quiz = await _quizService.GetByIdAsync(model.Id);
-
             if (quiz == null)
                 return NotFound();
 
             if (quiz.CreatedBy != teacherId)
                 return Forbid();
 
-            // ✅ champs autorisés uniquement
             quiz.Title = model.Title;
             quiz.Description = model.Description;
+            quiz.GroupId = model.GroupId;
+            quiz.StartDate = model.StartDate;
+            quiz.EndDate = model.EndDate;
+            quiz.Questions = model.Questions;
 
             await _quizService.UpdateAsync(quiz);
 
             TempData["Success"] = "Quiz modifié avec succès";
             return RedirectToAction("Quizzes");
         }
+
 
 
         // -----------------------------------------------------------

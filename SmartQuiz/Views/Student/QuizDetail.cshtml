@@ -1,1 +1,74 @@
-﻿
+﻿@model SmartQuiz.Models.Quiz
+@{
+    ViewData["Title"] = "Quiz";
+    Layout = "~/Views/Shared/_StudentLayout.cshtml";
+}
+
+<h2 class="mb-3">@Model.Title</h2>
+
+@if (Model.Status == "pending")
+{
+    <div class="alert alert-warning">
+        ⏳ Ce quiz n’est pas encore ouvert.
+    </div>
+    return;
+}
+
+@if (Model.Status == "closed")
+{
+    <div class="alert alert-danger">
+        🔒 Ce quiz est fermé.
+    </div>
+    return;
+}
+
+<form asp-action="SubmitQuiz" method="post">
+
+    <input type="hidden" name="QuizId" value="@Model.Id" />
+
+    @for (int i = 0; i < Model.Questions.Count; i++)
+    {
+        var q = Model.Questions[i];
+
+        <div class="card mb-3">
+            <div class="card-body">
+
+                <h5>Question @(i + 1)</h5>
+                <p>@q.Text</p>
+
+                <!-- ================= QCM ================= -->
+                @if (q.Options != null && q.Options.Any())
+                {
+                    for (int j = 0; j < q.Options.Count; j++)
+                    {
+                        <div class="form-check">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="Answers[@i].SelectedIndex"
+                                   value="@j"
+                                   required />
+
+                            <label class="form-check-label">
+                                @q.Options[j]
+                            </label>
+                        </div>
+                    }
+                }
+                <!-- ================= TEXTE ================= -->
+                else
+                {
+                <textarea class="form-control"
+                      name="Answers[@i].TextAnswer"
+                      rows="2"
+                      placeholder="Votre réponse..."
+                      required></textarea>
+                }
+
+            </div>
+        </div>
+    }
+
+    <button type="submit" class="btn btn-success w-100">
+        ✅ Soumettre mes réponses
+    </button>
+</form>
